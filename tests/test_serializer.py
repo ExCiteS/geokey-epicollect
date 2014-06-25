@@ -17,7 +17,11 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.attrib['required'], 'false')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
-        print xml.attrib['decimal']
+        try:
+            xml.attrib['decimal']
+            assert False
+        except KeyError:
+            assert True
 
     def test_serialize_required_textfield(self):
         field = TextFieldFactory(**{'required': True})
@@ -28,11 +32,16 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
+        try:
+            xml.attrib['decimal']
+            assert False
+        except KeyError:
+            assert True
 
     def test_serialize_number_field(self):
         field = NumericFieldFactory()
         serializer = ProjectFormSerializer()
-        xml = serializer.serialize_textfield(field)
+        xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.attrib['ref'], field.key)
         self.assertEqual(xml.attrib['required'], 'false')
@@ -43,7 +52,7 @@ class ProjectFormSerializerTest(TestCase):
     def test_serialize_required_number_field(self):
         field = NumericFieldFactory(**{'required': True})
         serializer = ProjectFormSerializer()
-        xml = serializer.serialize_textfield(field)
+        xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.attrib['ref'], field.key)
         self.assertEqual(xml.attrib['required'], 'true')
