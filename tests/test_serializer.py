@@ -2,32 +2,54 @@
 from django.test import TestCase
 
 from ..serializer import ProjectFormSerializer
-from observationtypes.tests.model_factories import TextFieldFactory
+from observationtypes.tests.model_factories import (
+    TextFieldFactory, NumericFieldFactory
+)
 
 
 class ProjectFormSerializerTest(TestCase):
     def test_serialize_textfield(self):
-        text_field = TextFieldFactory()
+        field = TextFieldFactory()
         serializer = ProjectFormSerializer()
-        xml = serializer.serialize_textfield(text_field)
+        xml = serializer.serialize_textfield(field)
 
-        self.assertEqual(xml.attrib['ref'], text_field.key)
+        self.assertEqual(xml.attrib['ref'], field.key)
         self.assertEqual(xml.attrib['required'], 'false')
         self.assertEqual(xml[0].tag, 'label')
-        self.assertEqual(xml[0].text, text_field.name)
+        self.assertEqual(xml[0].text, field.name)
+        print xml.attrib['decimal']
 
     def test_serialize_required_textfield(self):
-        text_field = TextFieldFactory(**{'required': True})
+        field = TextFieldFactory(**{'required': True})
         serializer = ProjectFormSerializer()
-        xml = serializer.serialize_textfield(text_field)
+        xml = serializer.serialize_textfield(field)
 
-        self.assertEqual(xml.attrib['ref'], text_field.key)
+        self.assertEqual(xml.attrib['ref'], field.key)
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml[0].tag, 'label')
-        self.assertEqual(xml[0].text, text_field.name)
+        self.assertEqual(xml[0].text, field.name)
 
-    # def test_serialize_number_field(self):
-    #     pass
+    def test_serialize_number_field(self):
+        field = NumericFieldFactory()
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_textfield(field)
+
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['decimal'], 'true')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+    def test_serialize_required_number_field(self):
+        field = NumericFieldFactory(**{'required': True})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_textfield(field)
+
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'true')
+        self.assertEqual(xml.attrib['decimal'], 'true')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
 
     # def test_serialize_truefalse_field(self):
     #     pass
