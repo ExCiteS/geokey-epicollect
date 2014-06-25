@@ -60,6 +60,54 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
 
+    def test_serialize_number_field_with_minfield(self):
+        field = NumericFieldFactory(**{'required': True, 'minval': 12})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_numericfield(field)
+
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'true')
+        self.assertEqual(xml.attrib['decimal'], 'true')
+        self.assertEqual(xml.attrib['min'], '12')
+        try:
+            xml.attrib['max']
+            assert False
+        except KeyError:
+            assert True
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+    def test_serialize_number_field_with_maxfield(self):
+        field = NumericFieldFactory(**{'required': True, 'maxval': 12})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_numericfield(field)
+
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'true')
+        self.assertEqual(xml.attrib['decimal'], 'true')
+        self.assertEqual(xml.attrib['max'], '12')
+        try:
+            xml.attrib['min']
+            assert False
+        except KeyError:
+            assert True
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+    def test_serialize_number_field_with_minmaxfield(self):
+        field = NumericFieldFactory(
+            **{'required': True, 'minval': 2, 'maxval': 12})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_numericfield(field)
+
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'true')
+        self.assertEqual(xml.attrib['decimal'], 'true')
+        self.assertEqual(xml.attrib['min'], '2')
+        self.assertEqual(xml.attrib['max'], '12')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
     # def test_serialize_truefalse_field(self):
     #     pass
 

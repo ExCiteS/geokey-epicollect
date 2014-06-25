@@ -27,6 +27,11 @@ class ProjectFormSerializer(object):
             decimal='true'
         )
 
+        if field.minval is not None:
+            element.attrib['min'] = str(field.minval)
+        if field.maxval is not None:
+            element.attrib['max'] = str(field.maxval)
+
         label = etree.Element("label")
         label.text = field.name
         element.append(label)
