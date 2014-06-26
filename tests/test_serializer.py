@@ -7,6 +7,9 @@ from observationtypes.tests.model_factories import (
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
 )
 
+from projects.tests.model_factories import ProjectF
+from observationtypes.tests.model_factories import ObservationTypeFactory
+
 
 class ProjectFormSerializerTest(TestCase):
     # ########################################################################
@@ -205,3 +208,30 @@ class ProjectFormSerializerTest(TestCase):
             xml.attrib['min']
             xml.attrib['max']
             xml.attrib['decimal']
+
+    def test_serialize_project(self):
+        project = ProjectF()
+        type1 = ObservationTypeFactory.create(**{'project': project})
+        TextFieldFactory(**{'observationtype': type1})
+        type2 = ObservationTypeFactory.create(**{'project': project})
+        TextFieldFactory(**{'observationtype': type2})
+        type3 = ObservationTypeFactory.create(**{'project': project})
+        TextFieldFactory(**{'observationtype': type3})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize(project, 'http://192.168.57.10:8000')
+
+        self.assertEqual(
+            xml.find('model').find('submission').attrib['id'], str(project.id)
+        )
+        self.assertEqual(
+            xml.find('model').find('submission').attrib['projectName'],
+            project.name
+        )
+        self.assertEqual(
+            xml.find('model').find('uploadToServer').text,
+            'http://192.168.57.10:8000/epicollect/projects/%s/upload/' % project.id
+        )
+        self.assertEqual(
+            xml.find('model').find('downloadFromServer').text,
+            'http://192.168.57.10:8000/epicollect/projects/%s/download/' % project.id
+        )

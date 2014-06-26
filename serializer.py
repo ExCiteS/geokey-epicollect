@@ -2,10 +2,15 @@
 Serialises a Community Maps into EcML, an XML dialiect describing forms for
 EpiCollect's mobile app.
 """
+from django.core.urlresolvers import reverse
+
 from lxml import etree
 
 
 class ProjectFormSerializer(object):
+    # ########################################################################
+    # Helpers
+    # ########################################################################
     def create_label(self, field_name):
         """
         Creates a `<label>` element for a field
@@ -50,6 +55,10 @@ class ProjectFormSerializer(object):
             ref=field.key,
             required=str(field.required).lower()
         )
+
+    # ########################################################################
+    # Field serialisers
+    # ########################################################################
 
     def serialize_textfield(self, field):
         """
@@ -109,3 +118,79 @@ class ProjectFormSerializer(object):
         element.append(self.create_label(field.name))
 
         return element
+
+    def serialize_field(self, field):
+        if field.fieldtype == 'TextField':
+            return self.serialize_textfield(field)
+        elif field.fieldtype == 'NumericField':
+            return self.serialize_numericfield(field)
+        elif field.fieldtype == 'TrueFalseField':
+            return self.serialize_truefalse_field(field)
+        elif field.fieldtype == 'DateTimeField':
+            return self.serialize_datetime_field(field)
+        elif field.fieldtype == 'LookupField':
+            return self.serialize_singlelookup_field(field)
+        else:
+            raise TypeError('Unknown field type.')
+
+    def serialize_observationtypes(self, observationtypes):
+        form = etree.Element(
+            'form',
+            num='1',
+            main='true'
+        )
+
+        observationtype_select = etree.Element(
+            'select1',
+            ref='observationtype',
+            required='true',
+            jump=''
+        )
+        form.append(observationtype_select)
+
+        for type_idx, observationtype in enumerate(observationtypes.all()):
+            observationtype_select.append(
+                self.create_item(observationtype.name, observationtype.id))
+
+            for field_idx, field in enumerate(observationtype.fields.all()):
+                if field_idx == 0:
+                    jump = observationtype_select.attrib['jump']
+                    if len(jump) == 0:
+                        jump = field.key + ',' + str(type_idx + 1)
+                    else:
+                        jump = jump + ',' + field.key + ',' + str(type_idx + 1)
+                    observationtype_select.attrib['jump'] = jump
+
+                form.append(self.serialize_field(field))
+
+        return form
+
+    def serialize(self, project, base_url):
+        root = etree.Element('ecml', version='1')
+
+        model = etree.Element('model', version='1')
+        model.append(etree.Element(
+            'submission',
+            id=str(project.id),
+            projectName=project.name,
+            allowDownloadEdits='false',
+            versionNumber='2.1'
+        ))
+
+        upload = etree.Element('uploadToServer')
+        upload.text = base_url + reverse(
+            'epicollect:upload', kwargs={'project_id': project.id})
+        model.append(upload)
+
+        download = etree.Element('downloadFromServer')
+        download.text = base_url + reverse(
+            'epicollect:download', kwargs={'project_id': project.id})
+        model.append(download)
+        root.append(model)
+
+        form = self.serialize_observationtypes(project.observationtypes.all())
+        form.attrib['name'] = str(project.id)
+        form.attrib['id'] = str(project.id)
+        root.append(form)
+
+        return root
