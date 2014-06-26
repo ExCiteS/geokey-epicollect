@@ -2,6 +2,19 @@ from lxml import etree
 
 
 class ProjectFormSerializer(object):
+    def create_item(self, label, value):
+        item = etree.Element('item')
+
+        labelEl = etree.Element("label")
+        labelEl.text = label
+        item.append(labelEl)
+
+        valueEl = etree.Element("value")
+        valueEl.text = str(value)
+        item.append(valueEl)
+
+        return item
+
     def serialize_textfield(self, field):
         element = etree.Element(
             'input',
@@ -38,19 +51,6 @@ class ProjectFormSerializer(object):
 
         return element
 
-    def create_item(self, label, value):
-        item = etree.Element('item')
-
-        labelEl = etree.Element("label")
-        labelEl.text = label
-        item.append(labelEl)
-
-        valueEl = etree.Element("value")
-        valueEl.text = value
-        item.append(valueEl)
-
-        return item
-
     def serialize_truefalse_field(self, field):
         element = etree.Element(
             'select1',
@@ -64,4 +64,20 @@ class ProjectFormSerializer(object):
 
         element.append(self.create_item('True', 'true'))
         element.append(self.create_item('False', 'false'))
+        return element
+
+    def serialize_singlelookup_field(self, field):
+        element = etree.Element(
+            'select1',
+            ref=field.key,
+            required=str(field.required).lower()
+        )
+
+        label = etree.Element("label")
+        label.text = field.name
+        element.append(label)
+
+        for value in field.lookupvalues.filter(status='active'):
+            element.append(self.create_item(value.name, value.id))
+
         return element
