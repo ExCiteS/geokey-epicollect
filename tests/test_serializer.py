@@ -4,7 +4,7 @@ from django.test import TestCase
 from ..serializer import ProjectFormSerializer
 from observationtypes.tests.model_factories import (
     TextFieldFactory, NumericFieldFactory, TrueFalseFieldFactory,
-    LookupFieldFactory, LookupValueFactory
+    LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
 )
 
 
@@ -35,6 +35,7 @@ class ProjectFormSerializerTest(TestCase):
 
         with self.assertRaises(KeyError):
             xml.attrib['decimal']
+            xml.attrib['date']
 
     def test_serialize_required_textfield(self):
         field = TextFieldFactory(**{'required': True})
@@ -49,6 +50,7 @@ class ProjectFormSerializerTest(TestCase):
 
         with self.assertRaises(KeyError):
             xml.attrib['decimal']
+            xml.attrib['date']
 
     def test_serialize_number_field(self):
         field = NumericFieldFactory()
@@ -61,6 +63,9 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
+
+        with self.assertRaises(KeyError):
+            xml.attrib['date']
 
     def test_serialize_required_number_field(self):
         field = NumericFieldFactory(**{'required': True})
@@ -77,6 +82,7 @@ class ProjectFormSerializerTest(TestCase):
         with self.assertRaises(KeyError):
             xml.attrib['min']
             xml.attrib['max']
+            xml.attrib['date']
 
     def test_serialize_number_field_with_minfield(self):
         field = NumericFieldFactory(**{'required': True, 'minval': 12})
@@ -91,6 +97,7 @@ class ProjectFormSerializerTest(TestCase):
 
         with self.assertRaises(KeyError):
             xml.attrib['max']
+            xml.attrib['date']
 
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
@@ -105,8 +112,11 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml.attrib['max'], '12')
+
         with self.assertRaises(KeyError):
             xml.attrib['min']
+            xml.attrib['date']
+
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
 
@@ -124,6 +134,9 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.attrib['max'], '12')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
+
+        with self.assertRaises(KeyError):
+            xml.attrib['date']
 
     def test_serialize_truefalse_field(self):
         field = TrueFalseFieldFactory()
@@ -158,8 +171,12 @@ class ProjectFormSerializerTest(TestCase):
 
         serializer = ProjectFormSerializer()
         xml = serializer.serialize_singlelookup_field(field)
+
         self.assertEqual(xml.tag, 'select1')
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'false')
         self.assertEqual(len(xml.findall('item')), 3)
+
         for item in xml.findall('item'):
             self.assertIn(
                 item.find('label').text,
@@ -178,11 +195,33 @@ class ProjectFormSerializerTest(TestCase):
 
         serializer = ProjectFormSerializer()
         xml = serializer.serialize_singlelookup_field(field)
+
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(len(xml.findall('item')), 3)
 
-    # def test_serialize_datetime_field(self):
-    #     pass
+    def test_serialize_datetime_field(self):
+        field = DateTimeFieldFactory()
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_datetime_field(field)
 
-    
+        self.assertEqual(xml.tag, 'input')
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['date'], 'dd/MM/yyyy')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+        with self.assertRaises(KeyError):
+            xml.attrib['min']
+            xml.attrib['max']
+            xml.attrib['decimal']
+
+    def test_serialize_required_datetime_field(self):
+        field = DateTimeFieldFactory(**{'required': True})
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_datetime_field(field)
+
+        self.assertEqual(xml.tag, 'input')
+        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['required'], 'true')

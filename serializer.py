@@ -5,11 +5,11 @@ class ProjectFormSerializer(object):
     def create_item(self, label, value):
         item = etree.Element('item')
 
-        labelEl = etree.Element("label")
+        labelEl = etree.Element('label')
         labelEl.text = label
         item.append(labelEl)
 
-        valueEl = etree.Element("value")
+        valueEl = etree.Element('value')
         valueEl.text = str(value)
         item.append(valueEl)
 
@@ -24,7 +24,7 @@ class ProjectFormSerializer(object):
             genkey='true'
         )
 
-        label = etree.Element("label")
+        label = etree.Element('label')
         label.text = field.name
         element.append(label)
 
@@ -45,7 +45,7 @@ class ProjectFormSerializer(object):
         if field.maxval is not None:
             element.attrib['max'] = str(field.maxval)
 
-        label = etree.Element("label")
+        label = etree.Element('label')
         label.text = field.name
         element.append(label)
 
@@ -58,7 +58,7 @@ class ProjectFormSerializer(object):
             required=str(field.required).lower()
         )
 
-        label = etree.Element("label")
+        label = etree.Element('label')
         label.text = field.name
         element.append(label)
 
@@ -73,11 +73,25 @@ class ProjectFormSerializer(object):
             required=str(field.required).lower()
         )
 
-        label = etree.Element("label")
+        label = etree.Element('label')
         label.text = field.name
         element.append(label)
 
         for value in field.lookupvalues.filter(status='active'):
             element.append(self.create_item(value.name, value.id))
+
+        return element
+
+    def serialize_datetime_field(self, field):
+        element = etree.Element(
+            'input',
+            ref=field.key,
+            required=str(field.required).lower(),
+            date='dd/MM/yyyy'
+        )
+
+        label = etree.Element('label')
+        label.text = field.name
+        element.append(label)
 
         return element
