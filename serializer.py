@@ -191,6 +191,11 @@ class ProjectFormSerializer(object):
         form = self.serialize_observationtypes(project.observationtypes.all())
         form.attrib['name'] = str(project.id)
         form.attrib['id'] = str(project.id)
+
+        location = etree.Element('location', ref='location')
+        location.append(self.create_label('Location'))
+        form.insert(0, location)
+
         root.append(form)
 
         return root
