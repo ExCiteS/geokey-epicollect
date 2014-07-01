@@ -6,8 +6,9 @@ from projects.tests.model_factories import ProjectF
 from observationtypes.tests.model_factories import (
     ObservationTypeFactory, TextFieldFactory
 )
+from users.tests.model_factories import UserF
 
-from ..views import EpiCollectProject
+from ..views import EpiCollectProject, EpiCollectUploadView
 
 
 class ProjectDescriptionViewTest(APITestCase):
@@ -26,3 +27,43 @@ class ProjectDescriptionViewTest(APITestCase):
         view = EpiCollectProject.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
+
+
+class UploadDataTest(APITestCase):
+    def test_upload_data(self):
+        project = ProjectF.create(**{'isprivate': False})
+        type1 = ObservationTypeFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'observationtype': type1})
+
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&observationtype=' + str(type1.id) + '&' + field.key + '=Westbourne+Park'
+
+        factory = APIRequestFactory()
+        url = reverse('epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url, data, content_type='application/x-www-form-urlencoded')
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '1')
+
+    def test_upload_data_to_private_project(self):
+        project = ProjectF.create()
+        type1 = ObservationTypeFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'observationtype': type1})
+
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&observationtype=' + str(type1.id) + '&' + field.key + '=Westbourne+Park'
+
+        factory = APIRequestFactory()
+        url = reverse('epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url, data, content_type='application/x-www-form-urlencoded')
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '0')

@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 
-from views import EpiCollectProject, upload, download
+from views import (
+    EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
+)
 
 urlpatterns = patterns(
     '',
@@ -10,10 +12,10 @@ urlpatterns = patterns(
         name='project_form'),
     url(
         r'^projects/(?P<project_id>[0-9]+)/download/$',
-        download,
+        EpiCollectDownloadView.as_view(),
         name='download'),
     url(
         r'^projects/(?P<project_id>[0-9]+)/upload/$',
-        upload,
+        EpiCollectUploadView.as_view(),
         name='upload')
 )
