@@ -3,12 +3,14 @@ from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase, APIRequestFactory
 
 from projects.tests.model_factories import ProjectF
+from contributions.tests.model_factories import ObservationFactory
 from observationtypes.tests.model_factories import (
     ObservationTypeFactory, TextFieldFactory
 )
-from users.tests.model_factories import UserF
 
-from ..views import EpiCollectProject, EpiCollectUploadView
+from ..views import (
+    EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
+)
 
 
 class ProjectDescriptionViewTest(APITestCase):
@@ -67,3 +69,19 @@ class UploadDataTest(APITestCase):
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, '0')
+
+
+# class DownloadDataTest(APITestCase):
+#     def test_download_data(self):
+#         project = ProjectF.create(**{'isprivate': False})
+#         ObservationFactory.create_batch(20, **{'project': project})
+
+#         factory = APIRequestFactory()
+#         url = reverse('epicollect:download', kwargs={
+#             'project_id': project.id
+#         })
+#         request = factory.get(url)
+#         view = EpiCollectDownloadView.as_view()
+#         response = view(request, project_id=project.id)
+#         self.assertEqual(response.status_code, 200)
+#         print response

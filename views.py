@@ -1,6 +1,5 @@
 from django.views.generic import View
 from django.http import HttpResponse
-from django.core.exceptions import PermissionDenied
 
 from lxml import etree
 
@@ -56,4 +55,7 @@ class EpiCollectUploadView(View):
 
 class EpiCollectDownloadView(View):
     def get(self, request, project_id):
-        pass
+        project = Project.objects.get(pk=project_id)
+        if not project.isprivate:
+            # serialize observations
+            pass

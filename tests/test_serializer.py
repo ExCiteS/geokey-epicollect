@@ -1,7 +1,8 @@
 from lxml import etree
+import calendar
 from django.test import TestCase
 
-from ..serializer import ProjectFormSerializer
+from ..serializer import ProjectFormSerializer, DataSerializer
 from observationtypes.tests.model_factories import (
     TextFieldFactory, NumericFieldFactory, TrueFalseFieldFactory,
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
@@ -9,6 +10,7 @@ from observationtypes.tests.model_factories import (
 
 from projects.tests.model_factories import ProjectF
 from observationtypes.tests.model_factories import ObservationTypeFactory
+from contributions.tests.model_factories import ObservationFactory
 
 
 class ProjectFormSerializerTest(TestCase):
@@ -229,13 +231,44 @@ class ProjectFormSerializerTest(TestCase):
         )
         self.assertEqual(
             xml.find('model').find('uploadToServer').text,
-            'http://192.168.57.10:8000/epicollect/projects/%s/upload/' % project.id
+            'http://192.168.57.10:8000/epicollect/projects/%s/upload/' %
+            project.id
         )
         self.assertEqual(
             xml.find('model').find('downloadFromServer').text,
-            'http://192.168.57.10:8000/epicollect/projects/%s/download/' % project.id
+            'http://192.168.57.10:8000/epicollect/projects/%s/download/' %
+            project.id
         )
         self.assertEqual(
             xml.find('form').find('location').find('label').text,
             'Location'
         )
+
+
+class SerializeDataTest(TestCase):
+    def test_serialize_observation(self):
+        observation = ObservationFactory.create()
+        observation.attributes = {'thekey': '46'}
+
+        serializer = DataSerializer()
+        xml = serializer.serialize_entry(observation)
+
+        self.assertEqual(str(observation.id), xml.find('id').text)
+        self.assertEqual(
+            str(calendar.timegm(observation.created_at.utctimetuple())),
+            xml.find('created').text)
+        self.assertEqual(
+            str(calendar.timegm(observation.created_at.utctimetuple())),
+            xml.find('uploaded').text)
+
+    def test_serialize_all(self):
+        number = 20
+        project = ProjectF.create(**{'isprivate': False})
+        ObservationFactory.create_batch(
+            number, **{'project': project, 'attributes': {'key': 'value'}}
+        )
+
+        serializer = DataSerializer()
+        xml = serializer.serialize(project)
+
+        self.assertEqual(len(xml.findall('entry')), number)

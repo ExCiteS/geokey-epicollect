@@ -2,6 +2,7 @@
 Serialises a Community Maps into EcML, an XML dialiect describing forms for
 EpiCollect's mobile app.
 """
+import calendar
 from django.core.urlresolvers import reverse
 
 from lxml import etree
@@ -197,5 +198,45 @@ class ProjectFormSerializer(object):
         form.insert(0, location)
 
         root.append(form)
+
+        return root
+
+
+class DataSerializer(object):
+    def serialize_entry(self, observation):
+        entry = etree.Element('entry')
+
+        id = etree.Element('id')
+        id.text = str(observation.id)
+        entry.append(id)
+
+        location_lon = created = etree.Element('location_lon')
+        location_lon.text = str(observation.location.geometry.x)
+        entry.append(location_lon)
+
+        location_lat = created = etree.Element('location_lat')
+        location_lat.text = str(observation.location.geometry.y)
+        entry.append(location_lat)
+
+        created = etree.Element('created')
+        created.text = str(calendar.timegm(observation.created_at.utctimetuple()))
+        entry.append(created)
+
+        uploaded = etree.Element('uploaded')
+        uploaded.text = str(calendar.timegm(observation.created_at.utctimetuple()))
+        entry.append(uploaded)
+
+        for key, value in observation.attributes.iteritems():
+            el = etree.Element(key)
+            el.text = value
+            entry.append(el)
+
+        return entry
+
+    def serialize(self, project):
+        root = etree.Element('entries')
+
+        for observation in project.observations.all():
+            root.append(self.serialize_entry(observation))
 
         return root
