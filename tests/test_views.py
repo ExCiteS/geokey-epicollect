@@ -71,17 +71,18 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '0')
 
 
-# class DownloadDataTest(APITestCase):
-#     def test_download_data(self):
-#         project = ProjectF.create(**{'isprivate': False})
-#         ObservationFactory.create_batch(20, **{'project': project})
+class DownloadDataTest(APITestCase):
+    def test_download_data(self):
+        project = ProjectF.create(**{'isprivate': False})
+        ObservationFactory.create_batch(
+            20, **{'project': project, 'attributes': {'key': 'value'}})
 
-#         factory = APIRequestFactory()
-#         url = reverse('epicollect:download', kwargs={
-#             'project_id': project.id
-#         })
-#         request = factory.get(url)
-#         view = EpiCollectDownloadView.as_view()
-#         response = view(request, project_id=project.id)
-#         self.assertEqual(response.status_code, 200)
-#         print response
+        factory = APIRequestFactory()
+        url = reverse('epicollect:download', kwargs={
+            'project_id': project.id
+        })
+        request = factory.get(url)
+        view = EpiCollectDownloadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        print response

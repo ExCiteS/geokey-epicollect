@@ -7,7 +7,7 @@ from projects.models import Project
 from observationtypes.models import ObservationType
 from contributions.serializers import ContributionSerializer
 
-from serializer import ProjectFormSerializer
+from serializer import ProjectFormSerializer, DataSerializer
 
 
 class EpiCollectProject(View):
@@ -57,5 +57,7 @@ class EpiCollectDownloadView(View):
     def get(self, request, project_id):
         project = Project.objects.get(pk=project_id)
         if not project.isprivate:
-            # serialize observations
-            pass
+            serializer = DataSerializer()
+            xml = serializer.serialize(project)
+            return HttpResponse(
+                etree.tostring(xml), content_type='text/xml; charset=utf-8')

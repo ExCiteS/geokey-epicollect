@@ -219,11 +219,13 @@ class DataSerializer(object):
         entry.append(location_lat)
 
         created = etree.Element('created')
-        created.text = str(calendar.timegm(observation.created_at.utctimetuple()))
+        created.text = str(calendar.timegm(
+            observation.created_at.utctimetuple()))
         entry.append(created)
 
         uploaded = etree.Element('uploaded')
-        uploaded.text = str(calendar.timegm(observation.created_at.utctimetuple()))
+        uploaded.text = str(calendar.timegm(
+            observation.created_at.utctimetuple()))
         entry.append(uploaded)
 
         for key, value in observation.attributes.iteritems():
