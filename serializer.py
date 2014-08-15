@@ -57,8 +57,7 @@ class ProjectFormSerializer(object):
         """
         base_select = etree.Element(
             'select1',
-            ref='field_%s' % field.id,
-            required=str(field.required).lower()
+            ref='field_%s' % field.id
         )
 
         if field.required:
@@ -200,12 +199,20 @@ class ProjectFormSerializer(object):
         root.append(model)
 
         form = self.serialize_observationtypes(project.observationtypes.all())
-        form.attrib['name'] = str(project.id)
-        form.attrib['id'] = str(project.id)
+        form.attrib['name'] = 'form %s' % str(project.id)
+        form.attrib['key'] = 'form_%s' % str(project.id)
+
+        unique_id = etree.Element('input',
+            required='true',
+            title='true',
+            genkey='true'
+        )
+        unique_id.attrib['ref'] = 'form_%s' % str(project.id)
+        form.insert(0, unique_id)
 
         location = etree.Element('location', ref='location')
         location.append(self.create_label('Location'))
-        form.insert(0, location)
+        form.insert(1, location)
 
         root.append(form)
 
