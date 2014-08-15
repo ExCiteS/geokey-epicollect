@@ -208,6 +208,7 @@ class ProjectFormSerializer(object):
             genkey='true'
         )
         unique_id.attrib['ref'] = 'form_%s' % str(project.id)
+        unique_id.append(self.create_label('Unique ID'))
         form.insert(0, unique_id)
 
         location = etree.Element('location', ref='location')
