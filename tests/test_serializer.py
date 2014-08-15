@@ -37,14 +37,14 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.create_base_input(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
+        
 
         field = TextFieldFactory(**{'required': True})
         xml = serializer.create_base_input(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['required'], 'true')
 
     def test_create_base_select1(self):
@@ -54,14 +54,14 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.create_base_select1(field)
 
         self.assertEqual(xml.tag, 'select1')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
+        
 
         field = TrueFalseFieldFactory(**{'required': True})
         xml = serializer.create_base_select1(field)
 
         self.assertEqual(xml.tag, 'select1')
-        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['required'], 'true')
 
     # ########################################################################
@@ -74,8 +74,8 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_textfield(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
+        
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
 
@@ -89,8 +89,8 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
+        
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
@@ -106,7 +106,7 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml.attrib['min'], '12')
@@ -124,7 +124,7 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml.attrib['max'], '12')
@@ -143,7 +143,7 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_numericfield(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml.attrib['min'], '2')
@@ -160,8 +160,8 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_truefalse_field(field)
 
         self.assertEqual(xml.tag, 'select1')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
+        
 
         self.assertEqual(xml.find('label').text, field.name)
         self.assertEqual(len(xml.findall('item')), 2)
@@ -180,8 +180,7 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_singlelookup_field(field)
 
         self.assertEqual(xml.tag, 'select1')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(len(xml.findall('item')), 3)
 
         for item in xml.findall('item'):
@@ -200,8 +199,7 @@ class ProjectFormSerializerTest(TestCase):
         xml = serializer.serialize_datetime_field(field)
 
         self.assertEqual(xml.tag, 'input')
-        self.assertEqual(xml.attrib['ref'], field.key)
-        self.assertEqual(xml.attrib['required'], 'false')
+        self.assertEqual(xml.attrib['ref'], 'field_' + str(field.id))
         self.assertEqual(xml.attrib['date'], 'dd/MM/yyyy')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)

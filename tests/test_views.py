@@ -85,4 +85,3 @@ class DownloadDataTest(APITestCase):
         view = EpiCollectDownloadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        print response

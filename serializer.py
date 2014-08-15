@@ -39,11 +39,15 @@ class ProjectFormSerializer(object):
         Additional attributes can be added in the respective serializer
         methods.
         """
-        return etree.Element(
+        base_input = etree.Element(
             'input',
-            ref=field.key,
-            required=str(field.required).lower(),
+            ref='field_%s' % field.id
         )
+
+        if field.required:
+            base_input.attrib['required'] = 'true'
+
+        return base_input
 
     def create_base_select1(self, field):
         """
@@ -51,11 +55,16 @@ class ProjectFormSerializer(object):
         Additional attributes can be added in the respective serializer
         methods.
         """
-        return etree.Element(
+        base_select = etree.Element(
             'select1',
-            ref=field.key,
+            ref='field_%s' % field.id,
             required=str(field.required).lower()
         )
+
+        if field.required:
+            base_select.attrib['required'] = 'true'
+
+        return base_select
 
     # ########################################################################
     # Field serialisers
@@ -147,6 +156,7 @@ class ProjectFormSerializer(object):
             required='true',
             jump=''
         )
+        observationtype_select.append(self.create_label('Select type'))
         form.append(observationtype_select)
 
         for type_idx, observationtype in enumerate(observationtypes.all()):
@@ -157,9 +167,9 @@ class ProjectFormSerializer(object):
                 if field_idx == 0:
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
-                        jump = field.key + ',' + str(type_idx + 1)
+                        jump = ('field_%s' % field.id) + ',' + str(type_idx + 1)
                     else:
-                        jump = jump + ',' + field.key + ',' + str(type_idx + 1)
+                        jump = jump + ',' + ('field_%s' % field.id) + ',' + str(type_idx + 1)
                     observationtype_select.attrib['jump'] = jump
 
                 form.append(self.serialize_field(field))
