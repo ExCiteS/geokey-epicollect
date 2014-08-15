@@ -17,7 +17,7 @@ Use [EpiCollect](http://www.epicollect.net/)'s phone app as a mobile client to c
 2. Include the polls URLconf in your project urls.py like this:
 
     ```
-        url(r'^epicollect/', include('cm_epicollect.urls')),
+        url(r'^epicollect/', include('cm_epicollect.urls', namespace='epicollect')),
     ```
 
 3. Run `python manage.py migrate` to create the polls models.
