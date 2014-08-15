@@ -8,6 +8,7 @@ from observationtypes.models import ObservationType
 from contributions.serializers import ContributionSerializer
 
 from serializer import ProjectFormSerializer, DataSerializer
+from users.models import User
 
 
 class EpiCollectProject(View):
@@ -25,6 +26,8 @@ class EpiCollectUploadView(View):
         project = Project.objects.get(pk=project_id)
         if not project.isprivate:
             data = request.POST
+            user = User.objects.get(display_name='AnonymousUser')
+            project = Project.objects.get(pk=project_id)
 
             observation = {
                 'type': 'Feature',
@@ -36,18 +39,19 @@ class EpiCollectUploadView(View):
                     ]
                 },
                 'properties': {
-                    'user': project.creator.id,
-                    'project': project_id,
-                    'observationtype': data['observationtype']
+                    'contributiontype': data['contributiontype']
                 }
             }
             observationtype = ObservationType.objects.get(
-                pk=data['observationtype'])
+                pk=data['contributiontype'])
 
             for field in observationtype.fields.all():
                 observation['properties'][field.key] = data[field.key]
 
-            ContributionSerializer(data=observation)
+            ContributionSerializer(
+                data=observation,
+                context={'user': user, 'project': project}
+            )
             return HttpResponse('1')
         else:
             return HttpResponse('0')

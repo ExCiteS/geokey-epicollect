@@ -152,7 +152,7 @@ class ProjectFormSerializer(object):
 
         observationtype_select = etree.Element(
             'select1',
-            ref='observationtype',
+            ref='contributiontype',
             required='true',
             jump=''
         )
