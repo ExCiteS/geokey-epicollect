@@ -225,7 +225,7 @@ class ProjectFormSerializerTest(TestCase):
         )
         self.assertEqual(
             xml.find('model').find('submission').attrib['projectName'],
-            project.name
+            project.name.replace(' ', '_')
         )
         self.assertEqual(
             xml.find('model').find('uploadToServer').text,

@@ -128,19 +128,24 @@ class ProjectFormSerializer(object):
 
         return element
 
-    def serialize_field(self, field):
+    def serialize_field(self, field, jump_end):
         if field.fieldtype == 'TextField':
-            return self.serialize_textfield(field)
+            field = self.serialize_textfield(field)
         elif field.fieldtype == 'NumericField':
-            return self.serialize_numericfield(field)
+            field = self.serialize_numericfield(field)
         elif field.fieldtype == 'TrueFalseField':
-            return self.serialize_truefalse_field(field)
+            field = self.serialize_truefalse_field(field)
         elif field.fieldtype == 'DateTimeField':
-            return self.serialize_datetime_field(field)
+            field = self.serialize_datetime_field(field)
         elif field.fieldtype == 'LookupField':
-            return self.serialize_singlelookup_field(field)
+            field = self.serialize_singlelookup_field(field)
         else:
             raise TypeError('Unknown field type.')
+
+        if jump_end:
+            field.attrib['jump'] = 'END,ALL'
+
+        return field
 
     def serialize_observationtypes(self, observationtypes):
         form = etree.Element(
@@ -171,7 +176,7 @@ class ProjectFormSerializer(object):
                         jump = jump + ',' + ('field_%s' % field.id) + ',' + str(type_idx + 1)
                     observationtype_select.attrib['jump'] = jump
 
-                form.append(self.serialize_field(field))
+                form.append(self.serialize_field(field, field_idx == (len(observationtype.fields.all()) - 1)))
 
         return form
 
@@ -182,7 +187,7 @@ class ProjectFormSerializer(object):
         model.append(etree.Element(
             'submission',
             id=str(project.id),
-            projectName=project.name,
+            projectName=project.name.replace(' ', '_'),
             allowDownloadEdits='false',
             versionNumber='2.1'
         ))
@@ -199,7 +204,7 @@ class ProjectFormSerializer(object):
         root.append(model)
 
         form = self.serialize_observationtypes(project.observationtypes.all())
-        form.attrib['name'] = 'form %s' % str(project.id)
+        form.attrib['name'] = project.name
         form.attrib['key'] = 'form_%s' % str(project.id)
 
         unique_id = etree.Element('input',
