@@ -171,9 +171,9 @@ class ProjectFormSerializer(object):
                 if field_idx == 0:
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
-                        jump = ('field_%s' % field.id) + ',' + str(type_idx + 1)
+                        jump = ('%s_%s' % (field.observationtype.id, field.key)) + ',' + str(type_idx + 1)
                     else:
-                        jump = jump + ',' + ('field_%s' % field.id) + ',' + str(type_idx + 1)
+                        jump = jump + ',' + ('%s_%s' % (field.observationtype.id, field.key)) + ',' + str(type_idx + 1)
                     observationtype_select.attrib['jump'] = jump
 
                 form.append(self.serialize_field(field, field_idx == (len(observationtype.fields.all()) - 1)))
@@ -193,12 +193,12 @@ class ProjectFormSerializer(object):
         ))
 
         upload = etree.Element('uploadToServer')
-        upload.text = base_url + reverse(
+        upload.text = 'http://' + base_url + reverse(
             'epicollect:upload', kwargs={'project_id': project.id})
         model.append(upload)
 
         download = etree.Element('downloadFromServer')
-        download.text = base_url + reverse(
+        download.text = 'http://' + base_url + reverse(
             'epicollect:download', kwargs={'project_id': project.id})
         model.append(download)
         root.append(model)

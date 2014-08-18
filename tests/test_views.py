@@ -33,11 +33,14 @@ class ProjectDescriptionViewTest(APITestCase):
 
 class UploadDataTest(APITestCase):
     def test_upload_data(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectF.create(
+            **{'isprivate': False, 'everyone_contributes': True}
+        )
         type1 = ObservationTypeFactory.create(**{'project': project})
         field = TextFieldFactory(**{'observationtype': type1})
 
         data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + str(field.observationtype.id) + '_' + field.key + '=Westbourne+Park'
+        data = 'epicollect_insert=form1&table=EpiCollect&ecTimeCreated=1408374444168&ecPhoneID=6d8a5c6d6d97fd3f&ecJumped=27_number_of_bikes%2C27_id%2C27_street&location_lat=51.524817338213325&location_alt=109.5&location_acc=30.0&26_name=Warren+St&26_age=&form_21=071b85d2-4c91-4b8b-a0b5-566a7563ca9b&location_lon=-0.13451437465846539&27_number_of_bikes=&location_provider=gps&27_id=&location_bearing=226.0&27_street=&contributiontype=' + str(type1.id) + '&26_lines=20'
 
         factory = APIRequestFactory()
         url = reverse('epicollect:upload', kwargs={

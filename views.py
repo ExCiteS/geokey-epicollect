@@ -1,7 +1,7 @@
-from django.views.generic import View
 from django.http import HttpResponse
 
 from lxml import etree
+from rest_framework.views import APIView
 
 from projects.models import Project
 from observationtypes.models import ObservationType
@@ -11,7 +11,7 @@ from serializer import ProjectFormSerializer, DataSerializer
 from users.models import User
 
 
-class EpiCollectProject(View):
+class EpiCollectProject(APIView):
     def get(self, request, project_id):
         project = Project.objects.get(pk=project_id)
         if not project.isprivate:
@@ -21,11 +21,11 @@ class EpiCollectProject(View):
                 etree.tostring(xml), content_type='text/xml; charset=utf-8')
 
 
-class EpiCollectUploadView(View):
+class EpiCollectUploadView(APIView):
     def post(self, request, project_id):
         project = Project.objects.get(pk=project_id)
 
-        if not project.isprivate:
+        if not project.isprivate and project.everyone_contributes:
             data = request.POST
             user = User.objects.get(display_name='AnonymousUser')
             project = Project.objects.get(pk=project_id)
@@ -35,30 +35,30 @@ class EpiCollectUploadView(View):
                 'geometry': {
                     'type': 'Point',
                     'coordinates': [
-                        float(data['location_lon']),
-                        float(data['location_lat'])
+                        float(data.get('location_lon')),
+                        float(data.get('location_lat'))
                     ]
                 },
                 'properties': {
-                    'contributiontype': data['contributiontype']
+                    'contributiontype': data.get('contributiontype')
                 }
             }
             observationtype = ObservationType.objects.get(
-                pk=data['contributiontype'])
+                pk=data.get('contributiontype'))
 
             for field in observationtype.fields.all():
-                observation['properties'][field.key] = data[str(observationtype.id) + '_' + field.key]
+                observation['properties'][field.key] = data.get(str(observationtype.id) + '_' + field.key)
 
             ContributionSerializer(
                 data=observation,
                 context={'user': user, 'project': project}
             )
             return HttpResponse('1')
-        else:
-            return HttpResponse('0')
+
+        return HttpResponse('0')
 
 
-class EpiCollectDownloadView(View):
+class EpiCollectDownloadView(APIView):
     def get(self, request, project_id):
         project = Project.objects.get(pk=project_id)
         if not project.isprivate:
