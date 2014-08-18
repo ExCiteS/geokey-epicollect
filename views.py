@@ -24,6 +24,7 @@ class EpiCollectProject(View):
 class EpiCollectUploadView(View):
     def post(self, request, project_id):
         project = Project.objects.get(pk=project_id)
+
         if not project.isprivate:
             data = request.POST
             user = User.objects.get(display_name='AnonymousUser')
@@ -46,7 +47,7 @@ class EpiCollectUploadView(View):
                 pk=data['contributiontype'])
 
             for field in observationtype.fields.all():
-                observation['properties'][field.key] = data[field.key]
+                observation['properties'][field.key] = data[str(observationtype.id) + '_' + field.key]
 
             ContributionSerializer(
                 data=observation,
