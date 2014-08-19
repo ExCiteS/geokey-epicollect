@@ -71,7 +71,7 @@ class EpiCollectDownloadView(APIView):
             serializer = DataSerializer()
             if request.GET.get('xml') == 'false':
                 tsv = serializer.serialize_to_tsv(project)
-                return HttpResponse(tsv)
+                return HttpResponse(tsv, content_type='text/plain; charset=utf-8')
             else:
                 xml = serializer.serialize_to_xml(project)
                 return HttpResponse(
