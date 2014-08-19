@@ -69,6 +69,10 @@ class EpiCollectDownloadView(APIView):
         project = Project.objects.get(pk=project_id)
         if not project.isprivate:
             serializer = DataSerializer()
-            xml = serializer.serialize(project)
-            return HttpResponse(
-                etree.tostring(xml), content_type='text/xml; charset=utf-8')
+            if request.GET.get('xml') == 'false':
+                tsv = serializer.serialize_to_tsv(project)
+                return HttpResponse(tsv)
+            else:
+                xml = serializer.serialize_to_xml(project)
+                return HttpResponse(
+                    etree.tostring(xml), content_type='text/xml; charset=utf-8')

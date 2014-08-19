@@ -285,7 +285,7 @@ class SerializeDataTest(TestCase):
         observation.attributes = {'thekey': '46'}
 
         serializer = DataSerializer()
-        xml = serializer.serialize_entry(observation)
+        xml = serializer.serialize_entry_to_xml(observation)
 
         self.assertEqual(str(observation.id), xml.find('id').text)
         self.assertEqual(
@@ -296,7 +296,7 @@ class SerializeDataTest(TestCase):
             xml.find('uploaded').text
         )
 
-    def test_serialize_all(self):
+    def test_serialize_all_to_xml(self):
         number = 20
         project = ProjectF.create(**{'isprivate': False})
         ObservationFactory.create_batch(
@@ -304,6 +304,17 @@ class SerializeDataTest(TestCase):
         )
 
         serializer = DataSerializer()
-        xml = serializer.serialize(project)
+        xml = serializer.serialize_to_xml(project)
 
         self.assertEqual(len(xml.findall('entry')), number)
+
+    def test_serialize_all_to_tsv(self):
+        number = 20
+        project = ProjectF.create(**{'isprivate': False})
+        ObservationFactory.create_batch(
+            number, **{'project': project, 'attributes': {'key': 'value'}}
+        )
+
+        serializer = DataSerializer()
+        tsv = serializer.serialize_to_tsv(project)
+        self.assertEqual(20, tsv.count('\n'))

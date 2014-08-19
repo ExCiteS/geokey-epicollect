@@ -226,11 +226,12 @@ class ProjectFormSerializer(object):
 
 
 class DataSerializer(object):
-    def serialize_entry(self, observation):
-        static_fields = [
-            'unique_id', 'DeviceID', 'location_acc', 'location_provider',
-            'location_alt', 'location_bearing'
-        ]
+    static_fields = [
+        'unique_id', 'DeviceID', 'location_acc', 'location_provider',
+        'location_alt', 'location_bearing'
+    ]
+
+    def serialize_entry_to_xml(self, observation):
         entry = etree.Element('entry')
 
         id = etree.Element('id')
@@ -256,7 +257,7 @@ class DataSerializer(object):
 
         for key, value in observation.attributes.iteritems():
             tag_name = key
-            if key not in static_fields:
+            if key not in self.static_fields:
                 tag_name = tag_name + '_' + str(observation.observationtype.id) 
             el = etree.Element(tag_name)
 
@@ -269,7 +270,7 @@ class DataSerializer(object):
 
         return entry
 
-    def serialize(self, project):
+    def serialize_to_xml(self, project):
         root = etree.Element('entries')
 
         table = etree.Element('table')
@@ -280,6 +281,36 @@ class DataSerializer(object):
         root.append(table)
 
         for observation in project.observations.all():
-            root.append(self.serialize_entry(observation))
+            root.append(self.serialize_entry_to_xml(observation))
 
         return root
+
+    def serialize_entry_to_tsv(self, observation):
+        line = observation.project.name.replace(' ', '_') + '\t'
+
+        line = line + 'id\t' + str(observation.id) + '\t'
+        line = line + 'location_lon\t' + str(observation.location.geometry.x) + '\t'
+        line = line + 'location_lat\t' + str(observation.location.geometry.y) + '\t'
+        line = line + 'created\t' + str(calendar.timegm(observation.created_at.utctimetuple())) + '\t'
+        line = line + 'uploaded\t' + observation.created_at.strftime('%Y-%m-%d %H:%M:%S') + '\t'
+
+        for key, value in observation.attributes.iteritems():
+            tag_name = key
+            if key not in self.static_fields:
+                tag_name = tag_name + '_' + str(observation.observationtype.id) 
+
+            val = value
+            if value is None or len(value) == 0:
+                val = 'Null'
+
+            line = line + tag_name + '\t' + val + '\t'
+
+        return line + '\n'
+
+    def serialize_to_tsv(self, project):
+        tsv = ''
+
+        for observation in project.observations.all():
+            tsv = tsv + self.serialize_entry_to_tsv(observation)
+
+        return tsv
