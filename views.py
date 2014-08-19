@@ -47,7 +47,7 @@ class EpiCollectUploadView(APIView):
                 pk=data.get('contributiontype'))
 
             for field in observationtype.fields.all():
-                observation['properties'][field.key] = data.get(str(observationtype.id) + '_' + field.key)
+                observation['properties'][field.key] = data.get(field.key + '_' + str(observationtype.id))
 
             ContributionSerializer(
                 data=observation,

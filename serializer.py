@@ -171,9 +171,9 @@ class ProjectFormSerializer(object):
                 if field_idx == 0:
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
-                        jump = ('%s_%s' % (field.observationtype.id, field.key)) + ',' + str(type_idx + 1)
+                        jump = ('%s_%s' % (field.key, field.observationtype.id)) + ',' + str(type_idx + 1)
                     else:
-                        jump = jump + ',' + ('%s_%s' % (field.observationtype.id, field.key)) + ',' + str(type_idx + 1)
+                        jump = jump + ',' + ('%s_%s' % (field.key, field.observationtype.id)) + ',' + str(type_idx + 1)
                     observationtype_select.attrib['jump'] = jump
 
                 form.append(self.serialize_field(field, field_idx == (len(observationtype.fields.all()) - 1)))
@@ -204,7 +204,7 @@ class ProjectFormSerializer(object):
         root.append(model)
 
         form = self.serialize_observationtypes(project.observationtypes.all())
-        form.attrib['name'] = project.name
+        form.attrib['name'] = project.name.replace(' ', '_')
         form.attrib['key'] = 'form_%s' % str(project.id)
 
         unique_id = etree.Element('input',
@@ -252,7 +252,7 @@ class DataSerializer(object):
         entry.append(uploaded)
 
         for key, value in observation.attributes.iteritems():
-            el = etree.Element(key)
+            el = etree.Element(key + '_' + str(observation.observationtype.id))
             el.text = value
             entry.append(el)
 
@@ -260,6 +260,13 @@ class DataSerializer(object):
 
     def serialize(self, project):
         root = etree.Element('entries')
+
+        table = etree.Element('table')
+        table_name = etree.Element('table_name')
+        table_name.text = project.name.replace(' ', '_')
+
+        table.append(table_name)
+        root.append(table)
 
         for observation in project.observations.all():
             root.append(self.serialize_entry(observation))
