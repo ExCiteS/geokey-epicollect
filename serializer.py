@@ -205,14 +205,14 @@ class ProjectFormSerializer(object):
 
         form = self.serialize_observationtypes(project.observationtypes.all())
         form.attrib['name'] = project.name.replace(' ', '_')
-        form.attrib['key'] = 'form_%s' % str(project.id)
+        form.attrib['key'] = 'unique_id'
 
         unique_id = etree.Element('input',
             required='true',
             title='true',
-            genkey='true'
+            genkey='true',
+            ref='unique_id'
         )
-        unique_id.attrib['ref'] = 'form_%s' % str(project.id)
         unique_id.append(self.create_label('Unique ID'))
         form.insert(0, unique_id)
 
@@ -247,13 +247,17 @@ class DataSerializer(object):
         entry.append(created)
 
         uploaded = etree.Element('uploaded')
-        uploaded.text = str(calendar.timegm(
-            observation.created_at.utctimetuple()))
+        uploaded.text = observation.created_at.strftime('%Y-%m-%d %H:%M:%S')
         entry.append(uploaded)
 
         for key, value in observation.attributes.iteritems():
             el = etree.Element(key + '_' + str(observation.observationtype.id))
-            el.text = value
+
+            if value is not None and len(value) > 0:
+                el.text = value
+            else:
+                el.text = 'Null'
+
             entry.append(el)
 
         return entry

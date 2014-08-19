@@ -40,7 +40,13 @@ class EpiCollectUploadView(APIView):
                     ]
                 },
                 'properties': {
-                    'contributiontype': data.get('contributiontype')
+                    'location_acc': data.get('location_acc'),
+                    'location_provider': data.get('location_provider'),
+                    'location_alt': data.get('location_alt'),
+                    'location_bearing': data.get('location_bearing'),
+                    'contributiontype': data.get('contributiontype'),
+                    'unique_id': data.get('unique_id'),
+                    'DeviceID': request.GET.get('phoneid')
                 }
             }
             observationtype = ObservationType.objects.get(

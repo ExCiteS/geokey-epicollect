@@ -39,7 +39,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         
 
@@ -49,7 +49,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
@@ -62,7 +62,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         
 
@@ -72,7 +72,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
@@ -88,7 +88,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         
         self.assertEqual(xml[0].tag, 'label')
@@ -106,7 +106,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -126,7 +126,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -147,7 +147,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -169,7 +169,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -189,7 +189,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         
 
@@ -212,7 +212,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(len(xml.findall('item')), 3)
 
@@ -234,7 +234,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            str(field.observationtype.id) + '_' + field.key
+            field.key + '_' + str(field.observationtype.id)
         )
         self.assertEqual(xml.attrib['date'], 'dd/MM/yyyy')
         self.assertEqual(xml[0].tag, 'label')
@@ -292,8 +292,9 @@ class SerializeDataTest(TestCase):
             str(calendar.timegm(observation.created_at.utctimetuple())),
             xml.find('created').text)
         self.assertEqual(
-            str(calendar.timegm(observation.created_at.utctimetuple())),
-            xml.find('uploaded').text)
+            observation.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            xml.find('uploaded').text
+        )
 
     def test_serialize_all(self):
         number = 20
