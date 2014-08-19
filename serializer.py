@@ -227,6 +227,10 @@ class ProjectFormSerializer(object):
 
 class DataSerializer(object):
     def serialize_entry(self, observation):
+        static_fields = [
+            'unique_id', 'DeviceID', 'location_acc', 'location_provider',
+            'location_alt', 'location_bearing'
+        ]
         entry = etree.Element('entry')
 
         id = etree.Element('id')
@@ -251,7 +255,10 @@ class DataSerializer(object):
         entry.append(uploaded)
 
         for key, value in observation.attributes.iteritems():
-            el = etree.Element(key + '_' + str(observation.observationtype.id))
+            tag_name = key
+            if key not in static_fields:
+                tag_name = tag_name + '_' + str(observation.observationtype.id) 
+            el = etree.Element(tag_name)
 
             if value is not None and len(value) > 0:
                 el.text = value
