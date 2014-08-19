@@ -41,7 +41,7 @@ class ProjectFormSerializer(object):
         """
         base_input = etree.Element(
             'input',
-            ref='%s_%s' % (field.observationtype.id, field.key)
+            ref='%s_%s' % (field.key, field.observationtype.id)
         )
 
         if field.required:
@@ -57,7 +57,7 @@ class ProjectFormSerializer(object):
         """
         base_select = etree.Element(
             'select1',
-            ref='%s_%s' % (field.observationtype.id, field.key)
+            ref='%s_%s' % (field.key, field.observationtype.id)
         )
 
         if field.required:
