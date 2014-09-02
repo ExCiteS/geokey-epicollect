@@ -40,20 +40,22 @@ class EpiCollectUploadView(APIView):
                     ]
                 },
                 'properties': {
-                    'location_acc': data.get('location_acc'),
-                    'location_provider': data.get('location_provider'),
-                    'location_alt': data.get('location_alt'),
-                    'location_bearing': data.get('location_bearing'),
-                    'contributiontype': data.get('contributiontype'),
-                    'unique_id': data.get('unique_id'),
-                    'DeviceID': request.GET.get('phoneid')
+                    'attributes': {
+                        'location_acc': data.get('location_acc'),
+                        'location_provider': data.get('location_provider'),
+                        'location_alt': data.get('location_alt'),
+                        'location_bearing': data.get('location_bearing'),
+                        'contributiontype': data.get('contributiontype'),
+                        'unique_id': data.get('unique_id'),
+                        'DeviceID': request.GET.get('phoneid')
+                    }
                 }
             }
             observationtype = ObservationType.objects.get(
                 pk=data.get('contributiontype'))
 
             for field in observationtype.fields.all():
-                observation['properties'][field.key] = data.get(field.key + '_' + str(observationtype.id))
+                observation['properties']['attributes'][field.key] = data.get(field.key + '_' + str(observationtype.id))
 
             ContributionSerializer(
                 data=observation,
