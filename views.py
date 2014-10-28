@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 
 from lxml import etree
+from rest_framework import status
 from rest_framework.views import APIView
 
 from projects.models import Project
@@ -19,6 +20,12 @@ class EpiCollectProject(APIView):
             xml = serializer.serialize(project, request.get_host())
             return HttpResponse(
                 etree.tostring(xml), content_type='text/xml; charset=utf-8')
+        else:
+            return HttpResponse(
+                '<error>The project mus be public.</error>',
+                content_type='text/xml; charset=utf-8',
+                status=status.HTTP_403_FORBIDDEN
+            )
 
 
 class EpiCollectUploadView(APIView):
