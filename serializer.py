@@ -171,16 +171,17 @@ class ProjectFormSerializer(object):
 
             for field_idx, field in enumerate(observationtype.fields.all()):
                 if field_idx == 0:
+                    field_key = field.key.replace('-', '_')
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
                         jump = ('%s_%s,%s' % (
-                            field.key,
+                            field_key,
                             field.observationtype.id,
                             str(type_idx + 1)
                         ))
                     else:
                         jump = jump + ',' + ('%s_%s,%s' % (
-                            field.key,
+                            field_key,
                             field.observationtype.id,
                             str(type_idx + 1)
                         ))
