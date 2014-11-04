@@ -40,6 +40,7 @@ class EpiCollectUploadView(APIView):
                     ]
                 },
                 'properties': {
+                    'contributiontype': data.get('contributiontype'),
                     'attributes': {
                         'location_acc': data.get('location_acc'),
                         'location_provider': data.get('location_provider'),
