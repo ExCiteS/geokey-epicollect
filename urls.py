@@ -7,7 +7,7 @@ from views import (
 urlpatterns = patterns(
     '',
     url(
-        r'^projects/(?P<project_id>[0-9]+)/$',
+        r'^projects/(?P<project_id>[0-9]+).xml$',
         EpiCollectProject.as_view(),
         name='project_form'),
     url(
