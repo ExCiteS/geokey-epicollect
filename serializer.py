@@ -39,9 +39,10 @@ class ProjectFormSerializer(object):
         Additional attributes can be added in the respective serializer
         methods.
         """
+        key = field.key.replace('-', '_')
         base_input = etree.Element(
             'input',
-            ref='%s_%s' % (field.key, field.observationtype.id)
+            ref='%s_%s' % (key, field.observationtype.id)
         )
 
         if field.required:
@@ -55,9 +56,10 @@ class ProjectFormSerializer(object):
         Additional attributes can be added in the respective serializer
         methods.
         """
+        key = field.key.replace('-', '_')
         base_select = etree.Element(
             'select1',
-            ref='%s_%s' % (field.key, field.observationtype.id)
+            ref='%s_%s' % (key, field.observationtype.id)
         )
 
         if field.required:
@@ -171,12 +173,22 @@ class ProjectFormSerializer(object):
                 if field_idx == 0:
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
-                        jump = ('%s_%s' % (field.key, field.observationtype.id)) + ',' + str(type_idx + 1)
+                        jump = ('%s_%s,%s' % (
+                            field.key,
+                            field.observationtype.id,
+                            str(type_idx + 1)
+                        ))
                     else:
-                        jump = jump + ',' + ('%s_%s' % (field.key, field.observationtype.id)) + ',' + str(type_idx + 1)
+                        jump = jump + ',' + ('%s_%s,%s' % (
+                            field.key,
+                            field.observationtype.id,
+                            str(type_idx + 1)
+                        ))
                     observationtype_select.attrib['jump'] = jump
 
-                form.append(self.serialize_field(field, field_idx == (len(observationtype.fields.all()) - 1)))
+                form.append(self.serialize_field(
+                    field, field_idx == (len(observationtype.fields.all()) - 1)
+                ))
 
         return form
 
@@ -207,7 +219,8 @@ class ProjectFormSerializer(object):
         form.attrib['name'] = project.name.replace(' ', '_')
         form.attrib['key'] = 'unique_id'
 
-        unique_id = etree.Element('input',
+        unique_id = etree.Element(
+            'input',
             required='true',
             title='true',
             genkey='true',
@@ -258,7 +271,7 @@ class DataSerializer(object):
         for key, value in observation.attributes.iteritems():
             tag_name = key
             if key not in self.static_fields:
-                tag_name = tag_name + '_' + str(observation.observationtype.id) 
+                tag_name = tag_name + '_' + str(observation.observationtype.id)
             el = etree.Element(tag_name)
 
             if value is not None and len(value) > 0:
@@ -297,7 +310,7 @@ class DataSerializer(object):
         for key, value in observation.attributes.iteritems():
             tag_name = key
             if key not in self.static_fields:
-                tag_name = tag_name + '_' + str(observation.observationtype.id) 
+                tag_name = tag_name + '_' + str(observation.observationtype.id)
 
             val = value
             if value is None or len(value) == 0:

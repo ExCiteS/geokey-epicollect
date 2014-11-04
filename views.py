@@ -63,7 +63,9 @@ class EpiCollectUploadView(APIView):
                 pk=data.get('contributiontype'))
 
             for field in observationtype.fields.all():
-                observation['properties']['attributes'][field.key] = data.get(field.key + '_' + str(observationtype.id))
+                key = field.key.replace('-', '_')
+                value = data.get(key + '_' + str(observationtype.id))
+                observation['properties']['attributes'][field.key] = value
 
             ContributionSerializer(
                 data=observation,
@@ -81,8 +83,13 @@ class EpiCollectDownloadView(APIView):
             serializer = DataSerializer()
             if request.GET.get('xml') == 'false':
                 tsv = serializer.serialize_to_tsv(project)
-                return HttpResponse(tsv, content_type='text/plain; charset=utf-8')
+                return HttpResponse(
+                    tsv,
+                    content_type='text/plain; charset=utf-8'
+                )
             else:
                 xml = serializer.serialize_to_xml(project)
                 return HttpResponse(
-                    etree.tostring(xml), content_type='text/xml; charset=utf-8')
+                    etree.tostring(xml),
+                    content_type='text/xml; charset=utf-8'
+                )
