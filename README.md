@@ -1,7 +1,7 @@
 # cm-epicollect
 
 
-Use [EpiCollect](http://www.epicollect.net/)'s phone app as a mobile client to collect data and store it with [GeoKey](http://geokey.org). 
+Use [EpiCollect](http://www.epicollect.net/)'s phone app as a mobile client to collect data and store it with [GeoKey](http://geokey.org.uk). 
 
 ## Quick start
 
