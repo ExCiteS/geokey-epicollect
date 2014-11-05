@@ -1,11 +1,11 @@
-# cm-epicollect
+# geokey-epicollect
 
 
 Use [EpiCollect](http://www.epicollect.net/)'s phone app as a mobile client to collect data and store it with [GeoKey](http://geokey.org.uk). 
 
 ## Quick start
 
-1. Add "cm\_epicollect" to your INSTALLED_APPS setting like this:
+1. Add "geokey-epicollect" to your INSTALLED_APPS setting like this:
 
     ```
         INSTALLED_APPS = (
