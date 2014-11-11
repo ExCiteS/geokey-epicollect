@@ -3,13 +3,13 @@ import calendar
 from django.test import TestCase
 
 from ..serializer import ProjectFormSerializer, DataSerializer
-from observationtypes.tests.model_factories import (
+from categories.tests.model_factories import (
     TextFieldFactory, NumericFieldFactory, TrueFalseFieldFactory,
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
 )
 
 from projects.tests.model_factories import ProjectF
-from observationtypes.tests.model_factories import ObservationTypeFactory
+from categories.tests.model_factories import CategoryFactory
 from contributions.tests.model_factories import ObservationFactory
 
 
@@ -39,9 +39,8 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
-        
 
         field = TextFieldFactory(**{'required': True})
         xml = serializer.create_base_input(field)
@@ -49,7 +48,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
@@ -62,9 +61,8 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
-        
 
         field = TrueFalseFieldFactory(**{'required': True})
         xml = serializer.create_base_select1(field)
@@ -72,7 +70,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
@@ -88,9 +86,9 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
-        
+
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
 
@@ -106,9 +104,9 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
-        
+
         self.assertEqual(xml.attrib['decimal'], 'true')
         self.assertEqual(xml[0].tag, 'label')
         self.assertEqual(xml[0].text, field.name)
@@ -126,7 +124,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -147,7 +145,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -169,7 +167,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['required'], 'true')
         self.assertEqual(xml.attrib['decimal'], 'true')
@@ -189,9 +187,8 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
-        
 
         self.assertEqual(xml.find('label').text, field.name)
         self.assertEqual(len(xml.findall('item')), 2)
@@ -212,7 +209,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'select1')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(len(xml.findall('item')), 3)
 
@@ -234,7 +231,7 @@ class ProjectFormSerializerTest(TestCase):
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
             xml.attrib['ref'],
-            field.key + '_' + str(field.observationtype.id)
+            field.key + '_' + str(field.category.id)
         )
         self.assertEqual(xml.attrib['date'], 'dd/MM/yyyy')
         self.assertEqual(xml[0].tag, 'label')
@@ -247,12 +244,12 @@ class ProjectFormSerializerTest(TestCase):
 
     def test_serialize_project(self):
         project = ProjectF()
-        type1 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type1})
-        type2 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type2})
-        type3 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type3})
+        type1 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type1})
+        type2 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type2})
+        type3 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type3})
         serializer = ProjectFormSerializer()
         xml = serializer.serialize(project, 'http://192.168.57.10:8000')
 

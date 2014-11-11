@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 
 from projects.models import Project
-from observationtypes.models import ObservationType
+from categories.models import Category
 from contributions.serializers import ContributionSerializer
 
 from serializer import ProjectFormSerializer, DataSerializer
@@ -47,20 +47,20 @@ class EpiCollectUploadView(APIView):
                     ]
                 },
                 'properties': {
-                    'category': data.get('contributiontype'),
+                    'category': data.get('category'),
                     'attributes': {
                         'location_acc': data.get('location_acc'),
                         'location_provider': data.get('location_provider'),
                         'location_alt': data.get('location_alt'),
                         'location_bearing': data.get('location_bearing'),
-                        'contributiontype': data.get('contributiontype'),
+                        'category': data.get('category'),
                         'unique_id': data.get('unique_id'),
                         'DeviceID': request.GET.get('phoneid')
                     }
                 }
             }
-            observationtype = ObservationType.objects.get(
-                pk=data.get('contributiontype'))
+            observationtype = Category.objects.get(
+                pk=data.get('category'))
 
             for field in observationtype.fields.all():
                 key = field.key.replace('-', '_')

@@ -42,7 +42,7 @@ class ProjectFormSerializer(object):
         key = field.key.replace('-', '_')
         base_input = etree.Element(
             'input',
-            ref='%s_%s' % (key, field.observationtype.id)
+            ref='%s_%s' % (key, field.category.id)
         )
 
         if field.required:
@@ -59,7 +59,7 @@ class ProjectFormSerializer(object):
         key = field.key.replace('-', '_')
         base_select = etree.Element(
             'select1',
-            ref='%s_%s' % (key, field.observationtype.id)
+            ref='%s_%s' % (key, field.category.id)
         )
 
         if field.required:
@@ -149,7 +149,7 @@ class ProjectFormSerializer(object):
 
         return field
 
-    def serialize_observationtypes(self, observationtypes):
+    def serialize_observationtypes(self, categories):
         form = etree.Element(
             'form',
             num='1',
@@ -165,30 +165,30 @@ class ProjectFormSerializer(object):
         observationtype_select.append(self.create_label('Select type'))
         form.append(observationtype_select)
 
-        for type_idx, observationtype in enumerate(observationtypes.all()):
+        for type_idx, category in enumerate(categories.all()):
             observationtype_select.append(
-                self.create_item(observationtype.name, observationtype.id))
+                self.create_item(category.name, category.id))
 
-            for field_idx, field in enumerate(observationtype.fields.all()):
+            for field_idx, field in enumerate(category.fields.all()):
                 if field_idx == 0:
                     field_key = field.key.replace('-', '_')
                     jump = observationtype_select.attrib['jump']
                     if len(jump) == 0:
                         jump = ('%s_%s,%s' % (
                             field_key,
-                            field.observationtype.id,
+                            field.category.id,
                             str(type_idx + 1)
                         ))
                     else:
                         jump = jump + ',' + ('%s_%s,%s' % (
                             field_key,
-                            field.observationtype.id,
+                            field.category.id,
                             str(type_idx + 1)
                         ))
                     observationtype_select.attrib['jump'] = jump
 
                 form.append(self.serialize_field(
-                    field, field_idx == (len(observationtype.fields.all()) - 1)
+                    field, field_idx == (len(category.fields.all()) - 1)
                 ))
 
         return form
@@ -216,7 +216,7 @@ class ProjectFormSerializer(object):
         model.append(download)
         root.append(model)
 
-        form = self.serialize_observationtypes(project.observationtypes.all())
+        form = self.serialize_observationtypes(project.categories.all())
         form.attrib['name'] = project.name.replace(' ', '_')
         form.attrib['key'] = 'unique_id'
 
@@ -272,7 +272,7 @@ class DataSerializer(object):
         for key, value in observation.attributes.iteritems():
             tag_name = key
             if key not in self.static_fields:
-                tag_name = tag_name + '_' + str(observation.observationtype.id)
+                tag_name = tag_name + '_' + str(observation.category.id)
             el = etree.Element(tag_name)
 
             if value is not None and len(value) > 0:
@@ -311,7 +311,7 @@ class DataSerializer(object):
         for key, value in observation.attributes.iteritems():
             tag_name = key
             if key not in self.static_fields:
-                tag_name = tag_name + '_' + str(observation.observationtype.id)
+                tag_name = tag_name + '_' + str(observation.category.id)
 
             val = value
             if value is None or len(value) == 0:

@@ -4,8 +4,8 @@ from rest_framework.test import APITestCase, APIRequestFactory
 
 from projects.tests.model_factories import ProjectF
 from contributions.tests.model_factories import ObservationFactory
-from observationtypes.tests.model_factories import (
-    ObservationTypeFactory, TextFieldFactory
+from categories.tests.model_factories import (
+    CategoryFactory, TextFieldFactory
 )
 
 from ..views import (
@@ -16,12 +16,12 @@ from ..views import (
 class ProjectDescriptionViewTest(APITestCase):
     def test_project_form(self):
         project = ProjectF.create(**{'isprivate': False})
-        type1 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type1})
-        type2 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type2})
-        type3 = ObservationTypeFactory.create(**{'project': project})
-        TextFieldFactory(**{'observationtype': type3})
+        type1 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type1})
+        type2 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type2})
+        type3 = CategoryFactory.create(**{'project': project})
+        TextFieldFactory(**{'category': type3})
         factory = APIRequestFactory()
         request = factory.get(
             reverse('epicollect:project_form', args=(project.id, )))
@@ -36,10 +36,10 @@ class UploadDataTest(APITestCase):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
-        type1 = ObservationTypeFactory.create(**{'project': project})
-        field = TextFieldFactory(**{'observationtype': type1})
+        type1 = CategoryFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.observationtype.id) + '=Westbourne+Park'
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
         url = reverse('epicollect:upload', kwargs={
@@ -55,10 +55,10 @@ class UploadDataTest(APITestCase):
 
     def test_upload_data_to_private_project(self):
         project = ProjectF.create()
-        type1 = ObservationTypeFactory.create(**{'project': project})
-        field = TextFieldFactory(**{'observationtype': type1})
+        type1 = CategoryFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.observationtype.id) + '=Westbourne+Park'
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
         url = reverse('epicollect:upload', kwargs={
