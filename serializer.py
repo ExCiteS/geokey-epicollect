@@ -270,7 +270,7 @@ class DataSerializer(object):
         entry.append(uploaded)
 
         for key, value in observation.attributes.iteritems():
-            tag_name = key
+            tag_name = key.replace('-', '_')
             if key not in self.static_fields:
                 tag_name = tag_name + '_' + str(observation.category.id)
             el = etree.Element(tag_name)
@@ -309,7 +309,7 @@ class DataSerializer(object):
         line = line + 'uploaded\t' + observation.created_at.strftime('%Y-%m-%d %H:%M:%S') + '\t'
 
         for key, value in observation.attributes.iteritems():
-            tag_name = key
+            tag_name = key.replace('-', '_')
             if key not in self.static_fields:
                 tag_name = tag_name + '_' + str(observation.category.id)
 
