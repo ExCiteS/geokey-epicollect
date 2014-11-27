@@ -50,15 +50,15 @@ class ProjectFormSerializer(object):
 
         return base_input
 
-    def create_base_select1(self, field):
+    def create_base_select(self, field, type):
         """
-        Creates a basic `<select1>` element for lookups and true/false fields.
+        Creates a basic `<radio>` element for lookups and true/false fields.
         Additional attributes can be added in the respective serializer
         methods.
         """
         key = field.key.replace('-', '_')
         base_select = etree.Element(
-            'select1',
+            type,
             ref='%s_%s' % (key, field.category.id)
         )
 
@@ -100,7 +100,19 @@ class ProjectFormSerializer(object):
         """
         Serialises a LookupField.
         """
-        element = self.create_base_select1(field)
+        element = self.create_base_select(field, 'radio')
+        element.append(self.create_label(field.name))
+
+        for value in field.lookupvalues.filter(status='active'):
+            element.append(self.create_item(value.name, value.id))
+
+        return element
+
+    def serialize_multiplelookup_field(self, field):
+        """
+        Serialises a MultipleLookupField.
+        """
+        element = self.create_base_select(field, 'select')
         element.append(self.create_label(field.name))
 
         for value in field.lookupvalues.filter(status='active'):

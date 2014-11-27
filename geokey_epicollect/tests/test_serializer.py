@@ -5,7 +5,8 @@ from django.test import TestCase
 from ..serializer import ProjectFormSerializer, DataSerializer
 from categories.tests.model_factories import (
     TextFieldFactory, NumericFieldFactory,
-    LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
+    LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory,
+    MultipleLookupFieldFactory, MultipleLookupValueFactory
 )
 
 from projects.tests.model_factories import ProjectF
@@ -52,22 +53,22 @@ class ProjectFormSerializerTest(TestCase):
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
-    def test_create_base_select1(self):
+    def test_create_base_select(self):
         serializer = ProjectFormSerializer()
 
         field = LookupFieldFactory()
-        xml = serializer.create_base_select1(field)
+        xml = serializer.create_base_select(field, 'radio')
 
-        self.assertEqual(xml.tag, 'select1')
+        self.assertEqual(xml.tag, 'radio')
         self.assertEqual(
             xml.attrib['ref'],
             field.key + '_' + str(field.category.id)
         )
 
         field = LookupFieldFactory(**{'required': True})
-        xml = serializer.create_base_select1(field)
+        xml = serializer.create_base_select(field, 'radio')
 
-        self.assertEqual(xml.tag, 'select1')
+        self.assertEqual(xml.tag, 'radio')
         self.assertEqual(
             xml.attrib['ref'],
             field.key + '_' + str(field.category.id)
@@ -188,7 +189,35 @@ class ProjectFormSerializerTest(TestCase):
         serializer = ProjectFormSerializer()
         xml = serializer.serialize_singlelookup_field(field)
 
-        self.assertEqual(xml.tag, 'select1')
+        self.assertEqual(xml.tag, 'radio')
+        self.assertEqual(
+            xml.attrib['ref'],
+            field.key + '_' + str(field.category.id)
+        )
+        self.assertEqual(len(xml.findall('item')), 3)
+
+        for item in xml.findall('item'):
+            self.assertIn(
+                item.find('label').text,
+                [val1.name, val2.name, val3.name]
+            )
+            self.assertIn(
+                item.find('value').text,
+                [str(val1.id), str(val2.id), str(val3.id)]
+            )
+
+    def test_serialize_multiple_lookup_field(self):
+        field = MultipleLookupFieldFactory()
+        val1 = MultipleLookupValueFactory(**{'field': field, 'name': 'Kermit'})
+        val2 = MultipleLookupValueFactory(
+            **{'field': field, 'name': 'Ms. Piggy'}
+        )
+        val3 = MultipleLookupValueFactory(**{'field': field, 'name': 'Gonzo'})
+
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_multiplelookup_field(field)
+
+        self.assertEqual(xml.tag, 'select')
         self.assertEqual(
             xml.attrib['ref'],
             field.key + '_' + str(field.category.id)
