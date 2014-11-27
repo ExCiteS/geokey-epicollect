@@ -1,3 +1,4 @@
+import json
 from django.http import HttpResponse
 
 from lxml import etree
@@ -65,6 +66,9 @@ class EpiCollectUploadView(APIView):
             for field in observationtype.fields.all():
                 key = field.key.replace('-', '_')
                 value = data.get(key + '_' + str(observationtype.id))
+                if field.fieldtype == 'MultipleLookupField':
+                    value = json.loads('[' + value + ']')
+
                 observation['properties']['attributes'][field.key] = value
 
             ContributionSerializer(
