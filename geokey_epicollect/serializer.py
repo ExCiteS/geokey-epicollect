@@ -96,17 +96,6 @@ class ProjectFormSerializer(object):
 
         return element
 
-    def serialize_truefalse_field(self, field):
-        """
-        Serialises a TrueFalseField.
-        """
-        element = self.create_base_select1(field)
-        element.append(self.create_label(field.name))
-        element.append(self.create_item('True', 'true'))
-        element.append(self.create_item('False', 'false'))
-
-        return element
-
     def serialize_singlelookup_field(self, field):
         """
         Serialises a LookupField.
@@ -135,8 +124,6 @@ class ProjectFormSerializer(object):
             field = self.serialize_textfield(field)
         elif field.fieldtype == 'NumericField':
             field = self.serialize_numericfield(field)
-        elif field.fieldtype == 'TrueFalseField':
-            field = self.serialize_truefalse_field(field)
         elif field.fieldtype == 'DateTimeField':
             field = self.serialize_datetime_field(field)
         elif field.fieldtype == 'LookupField':

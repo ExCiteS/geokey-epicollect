@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from ..serializer import ProjectFormSerializer, DataSerializer
 from categories.tests.model_factories import (
-    TextFieldFactory, NumericFieldFactory, TrueFalseFieldFactory,
+    TextFieldFactory, NumericFieldFactory,
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory
 )
 
@@ -55,7 +55,7 @@ class ProjectFormSerializerTest(TestCase):
     def test_create_base_select1(self):
         serializer = ProjectFormSerializer()
 
-        field = TrueFalseFieldFactory()
+        field = LookupFieldFactory()
         xml = serializer.create_base_select1(field)
 
         self.assertEqual(xml.tag, 'select1')
@@ -64,7 +64,7 @@ class ProjectFormSerializerTest(TestCase):
             field.key + '_' + str(field.category.id)
         )
 
-        field = TrueFalseFieldFactory(**{'required': True})
+        field = LookupFieldFactory(**{'required': True})
         xml = serializer.create_base_select1(field)
 
         self.assertEqual(xml.tag, 'select1')
@@ -178,24 +178,6 @@ class ProjectFormSerializerTest(TestCase):
 
         with self.assertRaises(KeyError):
             xml.attrib['date']
-
-    def test_serialize_truefalse_field(self):
-        field = TrueFalseFieldFactory()
-        serializer = ProjectFormSerializer()
-        xml = serializer.serialize_truefalse_field(field)
-
-        self.assertEqual(xml.tag, 'select1')
-        self.assertEqual(
-            xml.attrib['ref'],
-            field.key + '_' + str(field.category.id)
-        )
-
-        self.assertEqual(xml.find('label').text, field.name)
-        self.assertEqual(len(xml.findall('item')), 2)
-
-        for item in xml.findall('item'):
-            self.assertIn(item.find('label').text, ['True', 'False'])
-            self.assertIn(item.find('value').text, ['true', 'false'])
 
     def test_serialize_single_lookup_field(self):
         field = LookupFieldFactory()

@@ -39,7 +39,7 @@ class UploadDataTest(APITestCase):
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
         url = reverse('epicollect:upload', kwargs={
@@ -58,7 +58,7 @@ class UploadDataTest(APITestCase):
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&contributiontype=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
+        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
         url = reverse('epicollect:upload', kwargs={
