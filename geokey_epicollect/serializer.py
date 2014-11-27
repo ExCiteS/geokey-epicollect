@@ -140,7 +140,7 @@ class ProjectFormSerializer(object):
             field = self.serialize_datetime_field(field)
         elif field.fieldtype == 'LookupField':
             field = self.serialize_singlelookup_field(field)
-        elif field.fieldtype == 'MulitpleLookupField':
+        elif field.fieldtype == 'MultipleLookupField':
             field = self.serialize_multiplelookup_field(field)
         else:
             raise TypeError('Unknown field type.')
