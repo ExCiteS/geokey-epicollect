@@ -170,29 +170,28 @@ class ProjectFormSerializer(object):
             observationtype_select.append(
                 self.create_item(category.name, category.id))
 
-            if type_idx > 0:
-                for field_idx, field in enumerate(category.fields.filter(
-                        status='active')):
-                    if field_idx == 0:
-                        field_key = field.key.replace('-', '_')
-                        jump = observationtype_select.attrib['jump']
-                        if len(jump) == 0:
-                            jump = ('%s_%s,%s' % (
-                                field_key,
-                                field.category.id,
-                                str(type_idx + 1)
-                            ))
-                        else:
-                            jump = jump + ',' + ('%s_%s,%s' % (
-                                field_key,
-                                field.category.id,
-                                str(type_idx + 1)
-                            ))
-                        observationtype_select.attrib['jump'] = jump
+            for field_idx, field in enumerate(category.fields.filter(
+                    status='active')):
+                if type_idx > 0 and field_idx == 0:
+                    field_key = field.key.replace('-', '_')
+                    jump = observationtype_select.attrib['jump']
+                    if len(jump) == 0:
+                        jump = ('%s_%s,%s' % (
+                            field_key,
+                            field.category.id,
+                            str(type_idx + 1)
+                        ))
+                    else:
+                        jump = jump + ',' + ('%s_%s,%s' % (
+                            field_key,
+                            field.category.id,
+                            str(type_idx + 1)
+                        ))
+                    observationtype_select.attrib['jump'] = jump
 
-                    form.append(self.serialize_field(
-                        field, field_idx == (len(category.fields.all()) - 1)
-                    ))
+                form.append(self.serialize_field(
+                    field, field_idx == (len(category.fields.all()) - 1)
+                ))
 
         return form
 
