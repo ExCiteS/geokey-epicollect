@@ -215,7 +215,7 @@ class ProjectFormSerializer(object):
         model.append(etree.Element(
             'submission',
             id=str(project.id),
-            projectName=project.name.replace(' ', '_'),
+            projectName=project.name.replace(' ', '_').lower(),
             allowDownloadEdits='false',
             versionNumber='2.1'
         ))
