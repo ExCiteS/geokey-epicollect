@@ -1,0 +1,7 @@
+from extensions.base import register
+register(
+    'geokey_epicollect',
+    'EpiCollect',
+    display_admin=False,
+    superuser=False
+)
