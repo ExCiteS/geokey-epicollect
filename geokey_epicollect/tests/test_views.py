@@ -8,7 +8,7 @@ from categories.tests.model_factories import (
     CategoryFactory, TextFieldFactory, MultipleLookupFieldFactory,
     MultipleLookupValueFactory
 )
-
+from ..models import EpiCollectProject as EpiCollectProjectModel
 from ..views import (
     EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
 )
@@ -17,6 +17,7 @@ from ..views import (
 class ProjectDescriptionViewTest(APITestCase):
     def test_project_form(self):
         project = ProjectF.create(**{'isprivate': False})
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
         type1 = CategoryFactory.create(**{'project': project})
         TextFieldFactory(**{'category': type1})
         type2 = CategoryFactory.create(**{'project': project})
@@ -25,7 +26,7 @@ class ProjectDescriptionViewTest(APITestCase):
         TextFieldFactory(**{'category': type3})
         factory = APIRequestFactory()
         request = factory.get(
-            reverse('epicollect:project_form', args=(project.id, )))
+            reverse('geokey_epicollect:project_form', args=(project.id, )))
 
         view = EpiCollectProject.as_view()
         response = view(request, project_id=project.id)
@@ -37,13 +38,14 @@ class UploadDataTest(APITestCase):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
         data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
-        url = reverse('epicollect:upload', kwargs={
+        url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
         })
         request = factory.post(
@@ -58,6 +60,7 @@ class UploadDataTest(APITestCase):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
         type1 = CategoryFactory.create(**{'project': project})
         field = MultipleLookupFieldFactory(**{'category': type1})
         val_1 = MultipleLookupValueFactory(**{'field': field})
@@ -66,7 +69,7 @@ class UploadDataTest(APITestCase):
         data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=' + str(val_1.id) + '%2c+' + str(val_2.id)
 
         factory = APIRequestFactory()
-        url = reverse('epicollect:upload', kwargs={
+        url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
         })
         request = factory.post(
@@ -85,7 +88,7 @@ class UploadDataTest(APITestCase):
         data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
 
         factory = APIRequestFactory()
-        url = reverse('epicollect:upload', kwargs={
+        url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
         })
         request = factory.post(
@@ -100,11 +103,12 @@ class UploadDataTest(APITestCase):
 class DownloadDataTest(APITestCase):
     def test_download_data(self):
         project = ProjectF.create(**{'isprivate': False})
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
         ObservationFactory.create_batch(
             20, **{'project': project, 'attributes': {'key': 'value'}})
 
         factory = APIRequestFactory()
-        url = reverse('epicollect:download', kwargs={
+        url = reverse('geokey_epicollect:download', kwargs={
             'project_id': project.id
         })
         request = factory.get(url)

@@ -120,12 +120,23 @@ class ProjectFormSerializer(object):
 
         return element
 
-    def serialize_datetime_field(self, field):
+    def serialize_date_field(self, field):
         """
-        Serialises a DateTimeField.
+        Serialises a DateField or DateTimeField.
         """
         element = self.create_base_input(field)
         element.attrib['date'] = 'dd/MM/yyyy'
+
+        element.append(self.create_label(field.name))
+
+        return element
+
+    def serialize_time_field(self, field):
+        """
+        Serialises a DateField or DateTimeField.
+        """
+        element = self.create_base_input(field)
+        element.attrib['time'] = 'HH:mm'
 
         element.append(self.create_label(field.name))
 
@@ -136,8 +147,10 @@ class ProjectFormSerializer(object):
             field = self.serialize_textfield(field)
         elif field.fieldtype == 'NumericField':
             field = self.serialize_numericfield(field)
-        elif field.fieldtype == 'DateTimeField':
-            field = self.serialize_datetime_field(field)
+        elif field.fieldtype == 'DateTimeField' or field.fieldtype == 'DateField':
+            field = self.serialize_date_field(field)
+        elif field.fieldtype == 'TimeField':
+            field = self.serialize_time_field(field)
         elif field.fieldtype == 'LookupField':
             field = self.serialize_singlelookup_field(field)
         elif field.fieldtype == 'MultipleLookupField':
@@ -209,12 +222,12 @@ class ProjectFormSerializer(object):
 
         upload = etree.Element('uploadToServer')
         upload.text = 'http://' + base_url + reverse(
-            'epicollect:upload', kwargs={'project_id': project.id})
+            'geokey_epicollect:upload', kwargs={'project_id': project.id})
         model.append(upload)
 
         download = etree.Element('downloadFromServer')
         download.text = 'http://' + base_url + reverse(
-            'epicollect:download', kwargs={'project_id': project.id})
+            'geokey_epicollect:download', kwargs={'project_id': project.id})
         model.append(download)
         root.append(model)
 

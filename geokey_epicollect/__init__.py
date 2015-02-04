@@ -2,6 +2,6 @@ from extensions.base import register
 register(
     'geokey_epicollect',
     'EpiCollect',
-    display_admin=False,
+    display_admin=True,
     superuser=False
 )

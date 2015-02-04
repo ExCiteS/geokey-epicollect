@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %} | EpiCollect{% endblock %}
+
+{% block main %}
+<div class="page-header">
+    <div class="container">
+        <h1>EpiCollect</h1>
+    </div>
+</div>
+
+<div class="container">
+    {% include 'snippets/messages.html' %}
+    <div class="row">
+        <form class="col-md-8" method="POST" action="{% url 'geokey_epicollect:index' %}">
+            <h3>Manage your EpiCollect projects</h3>
+            {% csrf_token %}
+
+            {% for project in projects %}
+            <div class="overview-list-item">
+                <h4>{{ project.name }}</h4>
+                {% if project.description %}<p>{{project.description}}</p>{% endif %}
+                <p class="meta">Epicollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}">{% url 'geokey_epicollect:project_form' project.id %}</a></p>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="epicollect_project" value="{{ project.id }}" {% if project.epicollect %}checked{% endif %}> Enable for use with EpiCollect
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {% if forloop.last %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="reset" class="btn btn-link">Reset</button>
+            </div>
+            {% endif%}
+            {% empty %}
+            <div class="well empty-list">
+                <p class="lead">We couldn't find any projects you are eligible to manage.</p>
+                <p>You can create a new project if you want to start your own community map.</p>
+                <a href="{% url 'admin:project_create' %}" class="btn btn-success btn-lg">Create a new project</a>
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</div>
+{% endblock %}

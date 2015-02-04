@@ -26,5 +26,5 @@ sudo apt-get install libxslt1-dev
 2. Include the epicollect URLconf in your extensions urls.py (`core/url/extensios.py`) like this:
 
     ```
-        url(r'^epicollect/', include('geokey_epicollect.urls', namespace='epicollect')),
+        url(r'^epicollect/', include('geokey_epicollect.urls', namespace='geokey_epicollect')),
     ```

@@ -1,5 +1,7 @@
 import json
 from django.http import HttpResponse
+from django.views.generic import TemplateView
+from braces.views import LoginRequiredMixin
 
 from lxml import etree
 from rest_framework import status
@@ -11,19 +13,54 @@ from contributions.serializers import ContributionSerializer
 
 from serializer import ProjectFormSerializer, DataSerializer
 from users.models import User
+from .models import EpiCollectProject as EpiCollectProjectModel
+
+
+class IndexPage(LoginRequiredMixin, TemplateView):
+    template_name = 'epicollect_index.html'
+    exception_message = 'Managing Community Maps is for super-users only.'
+
+    def get_context_data(self, *args, **kwargs):
+        projects = Project.objects.filter(admins=self.request.user)
+        enabled = EpiCollectProjectModel.objects.filter(project__in=projects)
+
+        return super(IndexPage, self).get_context_data(
+            projects=projects,
+            epicollect=enabled,
+            *args,
+            **kwargs
+        )
+
+    def update_projects(self, projects, enabled, form=[]):
+        for p in projects:
+            if p in enabled and not str(p.id) in form:
+                EpiCollectProjectModel.objects.get(project=p).delete()
+            elif p not in enabled and str(p.id) in form:
+                EpiCollectProjectModel.objects.create(project=p, enabled=True)
+
+    def post(self, request):
+        context = self.get_context_data()
+        self.update_projects(
+            context.get('projects'),
+            [epi.project for epi in context.get('epicollect')],
+            self.request.POST.getlist('epicollect_project')
+        )
+        return self.render_to_response(context)
 
 
 class EpiCollectProject(APIView):
     def get(self, request, project_id):
-        project = Project.objects.get(pk=project_id)
-        if not project.isprivate:
+        try:
+            epicollect = EpiCollectProjectModel.objects.get(pk=project_id)
+
             serializer = ProjectFormSerializer()
-            xml = serializer.serialize(project, request.get_host())
+            xml = serializer.serialize(epicollect.project, request.get_host())
             return HttpResponse(
                 etree.tostring(xml), content_type='text/xml; charset=utf-8')
-        else:
+
+        except EpiCollectProjectModel.DoesNotExist:
             return HttpResponse(
-                '<error>The project mus be public.</error>',
+                '<error>The project must enabled for EpiCollect.</error>',
                 content_type='text/xml; charset=utf-8',
                 status=status.HTTP_403_FORBIDDEN
             )
@@ -31,12 +68,10 @@ class EpiCollectProject(APIView):
 
 class EpiCollectUploadView(APIView):
     def post(self, request, project_id):
-        project = Project.objects.get(pk=project_id)
-
-        if not project.isprivate and project.everyone_contributes:
+        try:
+            epicollect = EpiCollectProjectModel.objects.get(pk=project_id)
             data = request.POST
             user = User.objects.get(display_name='AnonymousUser')
-            project = Project.objects.get(pk=project_id)
 
             observation = {
                 'type': 'Feature',
@@ -73,27 +108,35 @@ class EpiCollectUploadView(APIView):
 
             ContributionSerializer(
                 data=observation,
-                context={'user': user, 'project': project}
+                context={'user': user, 'project': epicollect.project}
             )
             return HttpResponse('1')
 
-        return HttpResponse('0')
+        except EpiCollectProjectModel.DoesNotExist:
+            return HttpResponse('0')
 
 
 class EpiCollectDownloadView(APIView):
     def get(self, request, project_id):
-        project = Project.objects.get(pk=project_id)
-        if not project.isprivate:
+        try:
+            epicollect = EpiCollectProjectModel.objects.get(pk=project_id)
+
             serializer = DataSerializer()
             if request.GET.get('xml') == 'false':
-                tsv = serializer.serialize_to_tsv(project)
+                tsv = serializer.serialize_to_tsv(epicollect.project)
                 return HttpResponse(
                     tsv,
                     content_type='text/plain; charset=utf-8'
                 )
             else:
-                xml = serializer.serialize_to_xml(project)
+                xml = serializer.serialize_to_xml(epicollect.project)
                 return HttpResponse(
                     etree.tostring(xml),
                     content_type='text/xml; charset=utf-8'
                 )
+        except EpiCollectProjectModel.DoesNotExist:
+            return HttpResponse(
+                '<error>The project must enabled for EpiCollect.</error>',
+                content_type='text/xml; charset=utf-8',
+                status=status.HTTP_403_FORBIDDEN
+            )

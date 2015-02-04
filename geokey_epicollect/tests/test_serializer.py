@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from ..serializer import ProjectFormSerializer, DataSerializer
 from categories.tests.model_factories import (
-    TextFieldFactory, NumericFieldFactory,
+    TextFieldFactory, NumericFieldFactory, DateFieldFactory, TimeFieldFactory,
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory,
     MultipleLookupFieldFactory, MultipleLookupValueFactory
 )
@@ -234,10 +234,47 @@ class ProjectFormSerializerTest(TestCase):
                 [str(val1.id), str(val2.id), str(val3.id)]
             )
 
+    def test_serialize_date_field(self):
+        field = DateFieldFactory()
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_date_field(field)
+
+        self.assertEqual(xml.tag, 'input')
+        self.assertEqual(
+            xml.attrib['ref'],
+            field.key + '_' + str(field.category.id)
+        )
+        self.assertEqual(xml.attrib['date'], 'dd/MM/yyyy')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+        with self.assertRaises(KeyError):
+            xml.attrib['min']
+            xml.attrib['max']
+            xml.attrib['decimal']
+
+    def test_serialize_time_field(self):
+        field = TimeFieldFactory()
+        serializer = ProjectFormSerializer()
+        xml = serializer.serialize_time_field(field)
+        self.assertEqual(xml.tag, 'input')
+        self.assertEqual(
+            xml.attrib['ref'],
+            field.key + '_' + str(field.category.id)
+        )
+        self.assertEqual(xml.attrib['time'], 'HH:mm')
+        self.assertEqual(xml[0].tag, 'label')
+        self.assertEqual(xml[0].text, field.name)
+
+        with self.assertRaises(KeyError):
+            xml.attrib['min']
+            xml.attrib['max']
+            xml.attrib['decimal']
+
     def test_serialize_datetime_field(self):
         field = DateTimeFieldFactory()
         serializer = ProjectFormSerializer()
-        xml = serializer.serialize_datetime_field(field)
+        xml = serializer.serialize_date_field(field)
 
         self.assertEqual(xml.tag, 'input')
         self.assertEqual(
