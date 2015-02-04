@@ -1,2 +1,2 @@
-recursive-include geokey_extension/templates *
-recursive-include geokey_extension/migrations *
+recursive-include geokey_epicollect/templates *
+recursive-include geokey_epicollect/migrations *
