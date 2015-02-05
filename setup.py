@@ -7,20 +7,23 @@ setup(
     # Application name:
     name="geokey-epicollect",
 
+    description='Enables GeoKey to be used with EpiCollect for data collection.',
+
     # Version number (initial):
-    version="0.1.0",
+    version="0.1.0-beta",
 
     # Application author details:
     author="Oliver Roick",
     author_email="o.roick@ucl.ac.uk",
+
+    url = 'https://github.com/ExCiteS/geokey-epicollect', # use the URL to the github repo
+    download_url = 'https://github.com/ExCiteS/geokey-epicollect/tarball/0.1-beta',
 
     # Packages
     packages=["geokey_epicollect"],
 
     # Include additional files into the package
     include_package_data=True,
-
-    # long_description=open("README.txt").read(),
 
     # Dependent packages (distributions)
     install_requires=[
