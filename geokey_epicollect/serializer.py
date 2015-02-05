@@ -147,7 +147,8 @@ class ProjectFormSerializer(object):
             field = self.serialize_textfield(field)
         elif field.fieldtype == 'NumericField':
             field = self.serialize_numericfield(field)
-        elif field.fieldtype == 'DateTimeField' or field.fieldtype == 'DateField':
+        elif (field.fieldtype == 'DateTimeField' or
+                field.fieldtype == 'DateField'):
             field = self.serialize_date_field(field)
         elif field.fieldtype == 'TimeField':
             field = self.serialize_time_field(field)
@@ -179,7 +180,8 @@ class ProjectFormSerializer(object):
         observationtype_select.append(self.create_label('Select type'))
         form.append(observationtype_select)
 
-        for type_idx, category in enumerate(categories.all()):
+        for type_idx, category in enumerate(categories.filter(
+                status='active')):
             observationtype_select.append(
                 self.create_item(category.name, category.id))
 
