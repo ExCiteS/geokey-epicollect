@@ -12,6 +12,12 @@ sudo apt-get install libxml2-dev
 sudo apt-get install libxslt1-dev
 ```
 
+Install the package
+
+```
+pip install geokey-epicollect
+```
+
 ## Quick start
 
 1. Add "geokey_epicollect" to your INSTALLED_APPS settings (`core/settings/project.py`) like this:
