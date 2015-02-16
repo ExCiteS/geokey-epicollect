@@ -22,6 +22,8 @@ setup(
     # Packages
     packages=["geokey_epicollect"],
 
+    package_data={'geokey_epicollect': ['templates/*.html', 'migrations/*.py']},
+
     # Include additional files into the package
     include_package_data=True,
 
