@@ -15,7 +15,7 @@ sudo apt-get install libxslt1-dev
 Install the package
 
 ```
-pip install geokey-epicollect
+pip install sudo pip install -U git+https://github.com/ExCiteS/geokey-epicollect.git
 ```
 
 ## Quick start
@@ -32,5 +32,5 @@ pip install geokey-epicollect
 2. Include the epicollect URLconf in your extensions urls.py (`core/url/extensios.py`) like this:
 
     ```
-        url(r'^epicollect/', include('geokey_epicollect.urls', namespace='geokey_epicollect')),
+        url(r'^', include('geokey_epicollect.urls', namespace='geokey_epicollect')),
     ```
