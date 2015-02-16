@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     # Application name:
-    name="geokey-epicollect",
+    name="geokey_epicollect",
 
     description='Enables GeoKey to be used with EpiCollect for data collection.',
 
@@ -16,8 +16,8 @@ setup(
     author="Oliver Roick",
     author_email="o.roick@ucl.ac.uk",
 
-    url = 'https://github.com/ExCiteS/geokey-epicollect', # use the URL to the github repo
-    download_url = 'https://github.com/ExCiteS/geokey-epicollect/tarball/0.1-beta-2',
+    url='https://github.com/ExCiteS/geokey-epicollect', # use the URL to the github repo
+    download_url='https://github.com/ExCiteS/geokey-epicollect/tarball/0.1-beta-2',
 
     # Packages
     packages=["geokey_epicollect"],
