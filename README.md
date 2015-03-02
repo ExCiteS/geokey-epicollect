@@ -15,7 +15,7 @@ sudo apt-get install libxslt1-dev
 Install the package
 
 ```
-pip install sudo pip install -U git+https://github.com/ExCiteS/geokey-epicollect.git
+sudo pip install -U git+https://github.com/ExCiteS/geokey-epicollect.git
 ```
 
 ## Quick start
