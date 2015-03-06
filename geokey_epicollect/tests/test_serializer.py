@@ -75,6 +75,11 @@ class ProjectFormSerializerTest(TestCase):
         )
         self.assertEqual(xml.attrib['required'], 'true')
 
+    def test_get_photo_input(self):
+        serializer = ProjectFormSerializer()
+        xml = serializer.get_photo_input()
+        self.assertEqual(xml.tag, 'photo')
+
     # ########################################################################
     # Test serializers
     # ########################################################################
