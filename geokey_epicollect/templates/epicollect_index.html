@@ -13,11 +13,16 @@
     {% include 'snippets/messages.html' %}
     <div class="row">
         <form class="col-md-8" method="POST" action="{% url 'geokey_epicollect:index' %}">
-            <h3>Manage your EpiCollect projects</h3>
+            <h3 class="header">Manage your EpiCollect projects</h3>
             {% csrf_token %}
 
             {% for project in projects %}
-            <div class="overview-list-item">
+
+            {% if forloop.first %}
+            <ul class="list-unstyled overview-list">
+            {% endif %}
+
+            <li>
                 <h4>{{ project.name }}</h4>
                 {% if project.description %}<p>{{project.description}}</p>{% endif %}
                 <p class="meta">Epicollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}">http://{{ host }}{% url 'geokey_epicollect:project_form' project.id %}</a></p>
@@ -28,9 +33,10 @@
                         </label>
                     </div>
                 </div>
-            </div>
+            </li>
 
             {% if forloop.last %}
+            </ul>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Save</button>
                 <button type="reset" class="btn btn-link">Reset</button>
