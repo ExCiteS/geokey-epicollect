@@ -165,7 +165,7 @@ class ProjectFormSerializer(object):
             raise TypeError('Unknown field type.')
 
         if jump_end:
-            field.attrib['jump'] = 'END,ALL'
+            field.attrib['jump'] = 'photo,ALL'
 
         return field
 

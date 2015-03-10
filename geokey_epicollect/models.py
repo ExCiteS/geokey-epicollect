@@ -10,3 +10,8 @@ class EpiCollectProject(models.Model):
     )
 
     objects = models.Manager()
+
+
+class EpiCollectMedia(models.Model):
+    file_name = models.CharField(max_length=500)
+    contribution = models.ForeignKey('contributions.observation')

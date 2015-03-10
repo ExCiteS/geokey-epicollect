@@ -10,10 +10,14 @@ from rest_framework.views import APIView
 from projects.models import Project
 from categories.models import Category
 from contributions.serializers import ContributionSerializer
+from contributions.models.media import MediaFile
 
 from serializer import ProjectFormSerializer, DataSerializer
 from users.models import User
-from .models import EpiCollectProject as EpiCollectProjectModel
+from .models import (
+    EpiCollectMedia,
+    EpiCollectProject as EpiCollectProjectModel
+)
 
 
 class IndexPage(LoginRequiredMixin, TemplateView):
@@ -71,6 +75,12 @@ class EpiCollectUploadView(APIView):
     def post(self, request, project_id):
         try:
             epicollect = EpiCollectProjectModel.objects.get(pk=project_id)
+        except EpiCollectProjectModel.DoesNotExist:
+            return HttpResponse('0')
+
+        upload_type = request.GET.get('type')
+
+        if upload_type == 'data':
             data = request.POST
             user = User.objects.get(display_name='AnonymousUser')
 
@@ -107,14 +117,35 @@ class EpiCollectUploadView(APIView):
 
                 observation['properties']['attributes'][field.key] = value
 
-            ContributionSerializer(
+            contribution = ContributionSerializer(
                 data=observation,
                 context={'user': user, 'project': epicollect.project}
             )
+
+            photo_id = data.get('photo', default=None)
+            if photo_id is not None:
+                EpiCollectMedia.objects.create(
+                    contribution=contribution,
+                    file_name=photo_id
+                )
+
             return HttpResponse('1')
 
-        except EpiCollectProjectModel.DoesNotExist:
-            return HttpResponse('0')
+        elif upload_type == 'thumbnail':
+            for key, file in request.FILES.iteritems():
+                epicollect_file = EpiCollectMedia.objects.get(file_name=key)
+
+                MediaFile.objects.create(
+                    name=key,
+                    description=None,
+                    contribution=epicollect_file.contribution,
+                    creator=user,
+                    the_file=file
+                )
+
+                epicollect_file.delete()
+
+            return HttpResponse('1')
 
 
 class EpiCollectDownloadView(APIView):
