@@ -49,7 +49,10 @@ class UploadDataTest(APITestCase):
             'project_id': project.id
         })
         request = factory.post(
-            url, data, content_type='application/x-www-form-urlencoded')
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
 
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
@@ -73,7 +76,10 @@ class UploadDataTest(APITestCase):
             'project_id': project.id
         })
         request = factory.post(
-            url, data, content_type='application/x-www-form-urlencoded')
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
 
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
@@ -92,7 +98,10 @@ class UploadDataTest(APITestCase):
             'project_id': project.id
         })
         request = factory.post(
-            url, data, content_type='application/x-www-form-urlencoded')
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
 
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
