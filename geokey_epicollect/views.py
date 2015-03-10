@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from projects.models import Project
 from categories.models import Category
 from contributions.serializers import ContributionSerializer
-from contributions.models.media import MediaFile
+from contributions.models.media import ImageFile
 
 from serializer import ProjectFormSerializer, DataSerializer
 from users.models import User
@@ -78,11 +78,11 @@ class EpiCollectUploadView(APIView):
         except EpiCollectProjectModel.DoesNotExist:
             return HttpResponse('0')
 
+        user = User.objects.get(display_name='AnonymousUser')
         upload_type = request.GET.get('type')
 
         if upload_type == 'data':
             data = request.POST
-            user = User.objects.get(display_name='AnonymousUser')
 
             observation = {
                 'type': 'Feature',
@@ -106,12 +106,11 @@ class EpiCollectUploadView(APIView):
                     }
                 }
             }
-            observationtype = Category.objects.get(
-                pk=data.get('category'))
+            category = Category.objects.get(pk=data.get('category'))
 
-            for field in observationtype.fields.all():
+            for field in category.fields.all():
                 key = field.key.replace('-', '_')
-                value = data.get(key + '_' + str(observationtype.id))
+                value = data.get(key + '_' + str(category.id))
                 if field.fieldtype == 'MultipleLookupField':
                     value = json.loads('[' + value + ']')
 
@@ -125,22 +124,25 @@ class EpiCollectUploadView(APIView):
             photo_id = data.get('photo', default=None)
             if photo_id is not None:
                 EpiCollectMedia.objects.create(
-                    contribution=contribution,
+                    contribution=contribution.instance,
                     file_name=photo_id
                 )
 
             return HttpResponse('1')
 
         elif upload_type == 'thumbnail':
-            for key, file in request.FILES.iteritems():
-                epicollect_file = EpiCollectMedia.objects.get(file_name=key)
+            for key in request.FILES:
+                epicollect_file = EpiCollectMedia.objects.get(
+                    file_name=key[:key.rfind('.')]
+                )
+                file = request.FILES.get(key)
 
-                MediaFile.objects.create(
+                ImageFile.objects.create(
                     name=key,
-                    description=None,
-                    contribution=epicollect_file.contribution,
+                    description='Blah',
                     creator=user,
-                    the_file=file
+                    contribution=epicollect_file.contribution,
+                    image=file
                 )
 
                 epicollect_file.delete()

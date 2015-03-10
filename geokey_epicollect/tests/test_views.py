@@ -4,11 +4,14 @@ from rest_framework.test import APITestCase, APIRequestFactory
 
 from projects.tests.model_factories import ProjectF
 from contributions.tests.model_factories import ObservationFactory
+from contributions.tests.media.model_factories import get_image
 from categories.tests.model_factories import (
     CategoryFactory, TextFieldFactory, MultipleLookupFieldFactory,
     MultipleLookupValueFactory
 )
-from ..models import EpiCollectProject as EpiCollectProjectModel
+from ..models import (
+    EpiCollectMedia, EpiCollectProject as EpiCollectProjectModel
+)
 from ..views import (
     EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
 )
@@ -99,6 +102,30 @@ class UploadDataTest(APITestCase):
         })
         request = factory.post(
             url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '0')
+
+    def test_upload_image(self):
+        project = ProjectF.create()
+        contribution = ObservationFactory.create(**{'project': project})
+        EpiCollectMedia.objects.create(
+            contribution=contribution,
+            file_name='lmkasdasdnjkasndausidnjaksndsa.jpg'
+        )
+
+        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url + '?type=thumbnail',
             data,
             content_type='application/x-www-form-urlencoded'
         )
