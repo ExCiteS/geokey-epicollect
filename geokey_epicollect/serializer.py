@@ -69,7 +69,12 @@ class ProjectFormSerializer(object):
 
     def get_photo_input(self):
         photo = etree.Element('photo', ref='photo')
-        photo.append(self.create_label('Add Photo'))
+        photo.append(self.create_label('Add photo'))
+        return photo
+
+    def get_video_input(self):
+        photo = etree.Element('video', ref='video')
+        photo.append(self.create_label('Add video'))
         return photo
 
     # ########################################################################
@@ -243,6 +248,7 @@ class ProjectFormSerializer(object):
         form.attrib['key'] = 'unique_id'
 
         form.append(self.get_photo_input())
+        form.append(self.get_video_input())
 
         unique_id = etree.Element(
             'input',
