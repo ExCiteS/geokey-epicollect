@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from projects.models import Project
 from categories.models import Category
 from contributions.serializers import ContributionSerializer
-from contributions.models.media import ImageFile
+from contributions.models.media import ImageFile, MediaFile
 
 from serializer import ProjectFormSerializer, DataSerializer
 from users.models import User
@@ -128,6 +128,13 @@ class EpiCollectUploadView(APIView):
                     file_name=photo_id
                 )
 
+            video_id = data.get('video', default=None)
+            if video_id is not None:
+                EpiCollectMedia.objects.create(
+                    contribution=contribution.instance,
+                    file_name=video_id
+                )
+
             return HttpResponse('1')
 
         elif upload_type == 'thumbnail':
@@ -139,7 +146,7 @@ class EpiCollectUploadView(APIView):
 
                 ImageFile.objects.create(
                     name=key,
-                    description='Blah',
+                    description='',
                     creator=user,
                     contribution=epicollect_file.contribution,
                     image=file
@@ -147,6 +154,16 @@ class EpiCollectUploadView(APIView):
 
                 epicollect_file.delete()
 
+            return HttpResponse('1')
+
+        elif upload_type == 'video':
+            file = request.FILES.get('name')
+            name = file._name
+            epicollect_file = EpiCollectMedia.objects.get(file_name=name)
+
+            MediaFile.objects._create_video_file(
+                name, '', user, epicollect_file.contribution, file)
+            epicollect_file.delete()
             return HttpResponse('1')
 
 
