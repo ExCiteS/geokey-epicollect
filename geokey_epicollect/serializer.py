@@ -181,15 +181,14 @@ class ProjectFormSerializer(object):
             main='true'
         )
 
-        if len(categories) > 0:
-            category_select = etree.Element(
-                'select1',
-                ref='category',
-                required='true',
-                jump=''
-            )
-            category_select.append(self.create_label('Select type'))
-            form.append(category_select)
+        category_select = etree.Element(
+            'select1',
+            ref='category',
+            required='true',
+            jump=''
+        )
+        category_select.append(self.create_label('Select type'))
+        form.append(category_select)
 
         for type_idx, category in enumerate(categories):
             category_select.append(
