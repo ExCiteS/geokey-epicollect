@@ -174,32 +174,32 @@ class ProjectFormSerializer(object):
 
         return field
 
-    def serialize_observationtypes(self, categories):
+    def serialize_categories(self, categories):
         form = etree.Element(
             'form',
             num='1',
             main='true'
         )
 
-        observationtype_select = etree.Element(
-            'select1',
-            ref='category',
-            required='true',
-            jump=''
-        )
-        observationtype_select.append(self.create_label('Select type'))
-        form.append(observationtype_select)
+        if len(categories) > 0:
+            category_select = etree.Element(
+                'select1',
+                ref='category',
+                required='true',
+                jump=''
+            )
+            category_select.append(self.create_label('Select type'))
+            form.append(category_select)
 
-        for type_idx, category in enumerate(categories.filter(
-                status='active')):
-            observationtype_select.append(
+        for type_idx, category in enumerate(categories):
+            category_select.append(
                 self.create_item(category.name, category.id))
 
             for field_idx, field in enumerate(category.fields.filter(
                     status='active')):
                 if type_idx > 0 and field_idx == 0:
                     field_key = field.key.replace('-', '_')
-                    jump = observationtype_select.attrib['jump']
+                    jump = category_select.attrib['jump']
                     if len(jump) == 0:
                         jump = ('%s_%s,%s' % (
                             field_key,
@@ -212,7 +212,7 @@ class ProjectFormSerializer(object):
                             field.category.id,
                             str(type_idx + 1)
                         ))
-                    observationtype_select.attrib['jump'] = jump
+                    category_select.attrib['jump'] = jump
 
                 form.append(self.serialize_field(
                     field, field_idx == (len(category.fields.all()) - 1)
@@ -243,7 +243,9 @@ class ProjectFormSerializer(object):
         model.append(download)
         root.append(model)
 
-        form = self.serialize_observationtypes(project.categories.all())
+        form = self.serialize_categories(
+            project.categories.filter(status='active')
+        )
         form.attrib['name'] = project.name.replace(' ', '_')
         form.attrib['key'] = 'unique_id'
 
