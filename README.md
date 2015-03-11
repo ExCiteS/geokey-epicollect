@@ -38,5 +38,4 @@ sudo pip install -U git+https://github.com/ExCiteS/geokey-epicollect.git
 
     ```
         ../env/bin/python manage.py migrate
- 
     ```
