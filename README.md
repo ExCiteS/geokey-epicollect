@@ -36,7 +36,7 @@ sudo pip install -U git+https://github.com/ExCiteS/geokey-epicollect.git
     ```
 3. Add the epicollect table to the db like this: 
 
- ```
- ../env/bin/python manage.py migrate
+    ```
+        ../env/bin/python manage.py migrate
  
-```
+    ```
