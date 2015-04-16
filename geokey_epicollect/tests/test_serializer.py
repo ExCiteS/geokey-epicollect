@@ -3,15 +3,15 @@ import calendar
 from django.test import TestCase
 
 from ..serializer import ProjectFormSerializer, DataSerializer
-from categories.tests.model_factories import (
+from geokey.categories.tests.model_factories import (
     TextFieldFactory, NumericFieldFactory, DateFieldFactory, TimeFieldFactory,
     LookupFieldFactory, LookupValueFactory, DateTimeFieldFactory,
     MultipleLookupFieldFactory, MultipleLookupValueFactory
 )
 
-from projects.tests.model_factories import ProjectF
-from categories.tests.model_factories import CategoryFactory
-from contributions.tests.model_factories import ObservationFactory
+from geokey.projects.tests.model_factories import ProjectF
+from geokey.categories.tests.model_factories import CategoryFactory
+from geokey.contributions.tests.model_factories import ObservationFactory
 
 
 class ProjectFormSerializerTest(TestCase):
@@ -345,7 +345,7 @@ class SerializeDataTest(TestCase):
         number = 20
         project = ProjectF.create(**{'isprivate': False})
         ObservationFactory.create_batch(
-            number, **{'project': project, 'attributes': {'key': 'value'}}
+            number, **{'project': project, 'properties': {'key': 'value'}}
         )
 
         serializer = DataSerializer()
@@ -357,7 +357,7 @@ class SerializeDataTest(TestCase):
         number = 20
         project = ProjectF.create(**{'isprivate': False})
         ObservationFactory.create_batch(
-            number, **{'project': project, 'attributes': {'key': 'value'}}
+            number, **{'project': project, 'properties': {'key': 'value'}}
         )
 
         serializer = DataSerializer()

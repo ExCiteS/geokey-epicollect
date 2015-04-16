@@ -1,4 +1,4 @@
-from extensions.base import register
+from geokey.extensions.base import register
 register(
     'geokey_epicollect',
     'EpiCollect',

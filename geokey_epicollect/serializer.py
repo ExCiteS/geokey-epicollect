@@ -301,7 +301,7 @@ class DataSerializer(object):
         uploaded.text = observation.created_at.strftime('%Y-%m-%d %H:%M:%S')
         entry.append(uploaded)
 
-        for key, value in observation.attributes.iteritems():
+        for key, value in observation.properties.iteritems():
             tag_name = key.replace('-', '_')
             if key not in self.static_fields:
                 tag_name = tag_name + '_' + str(observation.category.id)
@@ -340,7 +340,7 @@ class DataSerializer(object):
         line = line + 'created\t' + str(calendar.timegm(observation.created_at.utctimetuple())) + '\t'
         line = line + 'uploaded\t' + observation.created_at.strftime('%Y-%m-%d %H:%M:%S') + '\t'
 
-        for key, value in observation.attributes.iteritems():
+        for key, value in observation.properties.iteritems():
             tag_name = key.replace('-', '_')
             if key not in self.static_fields:
                 tag_name = tag_name + '_' + str(observation.category.id)

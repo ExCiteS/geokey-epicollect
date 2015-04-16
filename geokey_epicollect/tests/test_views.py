@@ -2,10 +2,10 @@ from django.core.urlresolvers import reverse
 
 from rest_framework.test import APITestCase, APIRequestFactory
 
-from projects.tests.model_factories import ProjectF
-from contributions.tests.model_factories import ObservationFactory
-from contributions.tests.media.model_factories import get_image
-from categories.tests.model_factories import (
+from geokey.projects.tests.model_factories import ProjectF
+from geokey.contributions.tests.model_factories import ObservationFactory
+from geokey.contributions.tests.media.model_factories import get_image
+from geokey.categories.tests.model_factories import (
     CategoryFactory, TextFieldFactory, MultipleLookupFieldFactory,
     MultipleLookupValueFactory
 )
@@ -141,7 +141,7 @@ class DownloadDataTest(APITestCase):
         project = ProjectF.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         ObservationFactory.create_batch(
-            20, **{'project': project, 'attributes': {'key': 'value'}})
+            20, **{'project': project, 'properties': {'key': 'value'}})
 
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:download', kwargs={

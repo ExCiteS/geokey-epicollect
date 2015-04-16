@@ -8,6 +8,8 @@ geokey_epicollect/urls.py
 geokey_epicollect/views.py
 geokey_epicollect/migrations/0001_initial.py
 geokey_epicollect/migrations/0001_initial.pyc
+geokey_epicollect/migrations/0002_epicollectmedia.py
+geokey_epicollect/migrations/0002_epicollectmedia.pyc
 geokey_epicollect/migrations/__init__.py
 geokey_epicollect/migrations/__init__.pyc
 geokey_epicollect/templates/epicollect_index.html

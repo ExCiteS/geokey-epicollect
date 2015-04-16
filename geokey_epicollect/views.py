@@ -7,13 +7,13 @@ from lxml import etree
 from rest_framework import status
 from rest_framework.views import APIView
 
-from projects.models import Project
-from categories.models import Category
-from contributions.serializers import ContributionSerializer
-from contributions.models.media import ImageFile, MediaFile
+from geokey.projects.models import Project
+from geokey.categories.models import Category
+from geokey.contributions.serializers import ContributionSerializer
+from geokey.contributions.models import ImageFile, MediaFile
+from geokey.users.models import User
 
 from serializer import ProjectFormSerializer, DataSerializer
-from users.models import User
 from .models import (
     EpiCollectMedia,
     EpiCollectProject as EpiCollectProjectModel
