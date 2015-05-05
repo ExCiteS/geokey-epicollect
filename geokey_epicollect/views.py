@@ -94,16 +94,15 @@ class EpiCollectUploadView(APIView):
                     ]
                 },
                 'properties': {
+                    'location_acc': data.get('location_acc'),
+                    'location_provider': data.get('location_provider'),
+                    'location_alt': data.get('location_alt'),
+                    'location_bearing': data.get('location_bearing'),
+                    'unique_id': data.get('unique_id'),
+                    'DeviceID': request.GET.get('phoneid')
+                },
+                'meta': {
                     'category': data.get('category'),
-                    'attributes': {
-                        'location_acc': data.get('location_acc'),
-                        'location_provider': data.get('location_provider'),
-                        'location_alt': data.get('location_alt'),
-                        'location_bearing': data.get('location_bearing'),
-                        'category': data.get('category'),
-                        'unique_id': data.get('unique_id'),
-                        'DeviceID': request.GET.get('phoneid')
-                    }
                 }
             }
             category = Category.objects.get(pk=data.get('category'))
@@ -114,7 +113,7 @@ class EpiCollectUploadView(APIView):
                 if field.fieldtype == 'MultipleLookupField':
                     value = json.loads('[' + value + ']')
 
-                observation['properties']['attributes'][field.key] = value
+                observation['properties'][field.key] = value
 
             contribution = ContributionSerializer(
                 data=observation,
