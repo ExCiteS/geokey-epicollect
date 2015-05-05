@@ -7,7 +7,7 @@ setup(
     description='Enables GeoKey to be used with EpiCollect for data collection.',
 
     # Version number (initial):
-    version="0.2.0-beta-1",
+    version="0.2.0",
 
     # Application author details:
     author="Oliver Roick",
