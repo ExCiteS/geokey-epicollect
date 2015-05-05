@@ -119,15 +119,17 @@ class EpiCollectUploadView(APIView):
                 data=observation,
                 context={'user': user, 'project': epicollect.project}
             )
+            if contribution.is_valid(raise_exception=True):
+                contribution.save()
 
-            photo_id = data.get('photo', default=None)
+            photo_id = data.get('photo')
             if photo_id is not None:
                 EpiCollectMedia.objects.create(
                     contribution=contribution.instance,
                     file_name=photo_id
                 )
 
-            video_id = data.get('video', default=None)
+            video_id = data.get('video')
             if video_id is not None:
                 EpiCollectMedia.objects.create(
                     contribution=contribution.instance,
