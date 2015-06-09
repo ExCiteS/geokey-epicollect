@@ -45,7 +45,12 @@ class UploadDataTest(APITestCase):
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category={category}&'
+                '{field_key}_{category}=Westbourne+Park'.format(
+                    category=type1.id,
+                    field_key=field.key)
+                )
 
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
@@ -72,7 +77,15 @@ class UploadDataTest(APITestCase):
         val_1 = MultipleLookupValueFactory(**{'field': field})
         val_2 = MultipleLookupValueFactory(**{'field': field})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=' + str(val_1.id) + '%2c+' + str(val_2.id)
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category={category}&'
+                '{field_key}_{category}={checkbox_1}%2c+{checkbox_2}'.format(
+                    category=type1.id,
+                    field_key=field.key,
+                    checkbox_1=val_1.id,
+                    checkbox_2=val_2.id
+                    )
+                )
 
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
@@ -94,7 +107,12 @@ class UploadDataTest(APITestCase):
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
-        data = 'location_lat=51.5175205&location_lon=-0.1729205&location_acc=20&location_alt=&location_bearing=&category=' + str(type1.id) + '&' + field.key + '_' + str(field.category.id) + '=Westbourne+Park'
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category={category}&'
+                '{field_key}_{category}=Westbourne+Park'.format(
+                    category=type1.id,
+                    field_key=field.key)
+                )
 
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
