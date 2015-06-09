@@ -148,7 +148,7 @@ class EpiCollectUploadView(APIView):
 
             return HttpResponse('1')
 
-        elif upload_type == 'thumbnail':
+        elif upload_type in ['thumbnail', 'full_image']:
             for key in request.FILES:
                 try:
                     epicollect_file = EpiCollectMedia.objects.get(

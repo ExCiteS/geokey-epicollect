@@ -227,6 +227,27 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, '1')
 
+    def test_upload_image_with_fullimage_flag(self):
+        project = ProjectF.create()
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+        contribution = ObservationFactory.create(**{'project': project})
+        EpiCollectMedia.objects.create(
+            contribution=contribution,
+            file_name='lmkasdasdnjkasndausidnjaksndsa.jpg'
+        )
+
+        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(url + '?type=full_image', data)
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '1')
+
     def test_upload_image_with_wrong_file_name(self):
         project = ProjectF.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
