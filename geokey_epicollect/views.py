@@ -84,6 +84,14 @@ class EpiCollectUploadView(APIView):
         if upload_type == 'data':
             data = request.POST
 
+            try:
+                category = Category.objects.get(pk=data.get('category'))
+            except Category.DoesNotExist:
+                return HttpResponse('0')
+            except ValueError:
+                # The value provided for category is not a number
+                return HttpResponse('0')
+
             observation = {
                 'type': 'Feature',
                 'geometry': {
@@ -105,7 +113,6 @@ class EpiCollectUploadView(APIView):
                     'category': data.get('category'),
                 }
             }
-            category = Category.objects.get(pk=data.get('category'))
 
             for field in category.fields.all():
                 key = field.key.replace('-', '_')

@@ -67,6 +67,54 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, '1')
 
+    def test_upload_category_does_not_exist(self):
+        project = ProjectF.create(
+            **{'isprivate': False, 'everyone_contributes': True}
+        )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category=218421894')
+
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '0')
+
+    def test_upload_category_is_null(self):
+        project = ProjectF.create(
+            **{'isprivate': False, 'everyone_contributes': True}
+        )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category=Null')
+
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '0')
+
     def test_upload_checkboxes(self):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}
