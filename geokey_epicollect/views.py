@@ -150,10 +150,13 @@ class EpiCollectUploadView(APIView):
 
         elif upload_type == 'thumbnail':
             for key in request.FILES:
-                epicollect_file = EpiCollectMedia.objects.get(
-                    file_name=key[:key.rfind('.')]
-                )
-                file = request.FILES.get(key)
+                try:
+                    epicollect_file = EpiCollectMedia.objects.get(
+                        file_name=key[:key.rfind('.')]
+                    )
+                    file = request.FILES.get(key)
+                except EpiCollectMedia.DoesNotExist:
+                    return HttpResponse('0')
 
                 ImageFile.objects.create(
                     name=key,

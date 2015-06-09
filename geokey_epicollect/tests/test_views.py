@@ -208,6 +208,7 @@ class UploadDataTest(APITestCase):
 
     def test_upload_image(self):
         project = ProjectF.create()
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
             contribution=contribution,
@@ -219,11 +220,28 @@ class UploadDataTest(APITestCase):
         url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
         })
-        request = factory.post(
-            url + '?type=thumbnail',
-            data,
-            content_type='application/x-www-form-urlencoded'
+        request = factory.post(url + '?type=thumbnail', data)
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '1')
+
+    def test_upload_image_with_wrong_file_name(self):
+        project = ProjectF.create()
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+        contribution = ObservationFactory.create(**{'project': project})
+        EpiCollectMedia.objects.create(
+            contribution=contribution,
+            file_name='file_name.jpg'
         )
+
+        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(url + '?type=thumbnail', data)
 
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
