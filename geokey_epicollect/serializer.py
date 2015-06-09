@@ -262,7 +262,7 @@ class ProjectFormSerializer(object):
         unique_id.append(self.create_label('Unique ID'))
         form.insert(0, unique_id)
 
-        location = etree.Element('location', ref='location')
+        location = etree.Element('location', ref='location', required='true')
         location.append(self.create_label('Location'))
         form.insert(1, location)
 

@@ -319,6 +319,10 @@ class ProjectFormSerializerTest(TestCase):
             project.name.replace(' ', '_')
         )
         self.assertEqual(
+            xml.find('form').find('location').attrib['required'],
+            'true'
+        )
+        self.assertEqual(
             xml.find('form').find('location').find('label').text,
             'Location'
         )
