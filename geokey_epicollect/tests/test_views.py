@@ -67,6 +67,35 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, '1')
 
+    def test_upload_data_without_location(self):
+        project = ProjectF.create(
+            **{'isprivate': False, 'everyone_contributes': True}
+        )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+        type1 = CategoryFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'category': type1})
+
+        data = ('category={category}&{field_key}_{category}=Westbourne+'
+                'Park'.format(
+                    category=type1.id,
+                    field_key=field.key)
+                )
+
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '0')
+
     def test_upload_category_does_not_exist(self):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}

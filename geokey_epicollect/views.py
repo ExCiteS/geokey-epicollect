@@ -92,14 +92,17 @@ class EpiCollectUploadView(APIView):
                 # The value provided for category is not a number
                 return HttpResponse('0')
 
+            try:
+                lng = float(data.get('location_lon'))
+                lat = float(data.get('location_lat'))
+            except TypeError:
+                return HttpResponse('0')
+
             observation = {
                 'type': 'Feature',
                 'geometry': {
                     'type': 'Point',
-                    'coordinates': [
-                        float(data.get('location_lon')),
-                        float(data.get('location_lat'))
-                    ]
+                    'coordinates': [lng, lat]
                 },
                 'properties': {
                     'location_acc': data.get('location_acc'),
