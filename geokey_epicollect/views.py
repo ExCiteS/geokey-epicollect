@@ -100,9 +100,9 @@ class EpiCollectUploadView(APIView):
 
             observation = {
                 'type': 'Feature',
-                'geometry': {
-                    'type': 'Point',
-                    'coordinates': [lng, lat]
+                'location': {
+                    'geometry': ('{"type": "Point", "coordinates": '
+                                 '[%s, %s]}' % (lng, lat))
                 },
                 'properties': {
                     'location_acc': data.get('location_acc'),
