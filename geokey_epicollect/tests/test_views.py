@@ -1,7 +1,14 @@
+from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.http import HttpRequest, QueryDict
+from django.contrib.auth.models import AnonymousUser
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework.test import APITestCase, APIRequestFactory
 
+from geokey.users.tests.model_factories import UserF
+from geokey.projects.models import Project
 from geokey.projects.tests.model_factories import ProjectF
 from geokey.contributions.tests.model_factories import ObservationFactory
 from geokey.contributions.tests.media.model_factories import get_image
@@ -13,12 +20,94 @@ from ..models import (
     EpiCollectMedia, EpiCollectProject as EpiCollectProjectModel
 )
 from ..views import (
-    EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
+    IndexPage, EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
 )
 
 
+class IndexPageTest(TestCase):
+    def setUp(self):
+        self.view = IndexPage.as_view()
+        self.request = HttpRequest()
+        self.request.method = 'GET'
+        self.request.user = AnonymousUser()
+        self.request.META['SERVER_NAME'] = 'localhost'
+        self.request.META['SERVER_PORT'] = '8000'
+
+    def test_get_with_anonymous(self):
+        response = self.view(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/account/login/', response['location'])
+
+    def test_get_with_user(self):
+        project = ProjectF.create(**{'isprivate': False})
+        enabled = EpiCollectProjectModel.objects.create(
+            project=project, enabled=True
+        )
+
+        self.request.user = project.creator
+        response = self.view(self.request).render()
+
+        rendered = render_to_string(
+            'epicollect_index.html',
+            {
+                'projects': [project],
+                'epicollect': [enabled],
+                'host': self.request.get_host(),
+                'user': project.creator,
+                'PLATFORM_NAME': get_current_site(self.request).name
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content.decode('utf-8'), rendered)
+
+    def test_post_with_anonymous(self):
+        project = ProjectF.create(**{'isprivate': False})
+        EpiCollectProjectModel.objects.create(
+            project=project, enabled=True
+        )
+        self.request.method = 'POST'
+        self.request.POST = {
+            'epicollect_project': []
+        }
+        response = self.view(self.request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/admin/account/login/', response['location'])
+        self.assertEqual(EpiCollectProjectModel.objects.count(), 1)
+
+    def test_post_with_user(self):
+        user = UserF.create()
+        project = ProjectF.create(**{'isprivate': False, 'creator': user})
+        to_enable = ProjectF.create(**{'isprivate': False, 'creator': user})
+        EpiCollectProjectModel.objects.create(
+            project=project, enabled=True
+        )
+        self.request.method = 'POST'
+        self.request.POST = QueryDict('epicollect_project=%s' % to_enable.id)
+        self.request.user = user
+        response = self.view(self.request).render()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(EpiCollectProjectModel.objects.count(), 1)
+        rendered = render_to_string(
+            'epicollect_index.html',
+            {
+                'projects': [
+                    Project.objects.get(pk=project.id),
+                    Project.objects.get(pk=to_enable.id)
+                ],
+                'epicollect': [],
+                'host': self.request.get_host(),
+                'user': project.creator,
+                'PLATFORM_NAME': get_current_site(self.request).name
+            }
+        )
+        self.assertEqual(response.content.decode('utf-8'), rendered)
+
+
 class ProjectDescriptionViewTest(APITestCase):
-    def test_project_form(self):
+    def test_get_project(self):
         project = ProjectF.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         type1 = CategoryFactory.create(**{'project': project})
@@ -34,6 +123,19 @@ class ProjectDescriptionViewTest(APITestCase):
         view = EpiCollectProject.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
+
+    def test_get_not_existing_project(self):
+        factory = APIRequestFactory()
+        request = factory.get(
+            reverse('geokey_epicollect:project_form', args=(45454544, )))
+
+        view = EpiCollectProject.as_view()
+        response = view(request, project_id=45454544)
+        self.assertEqual(response.status_code, 403)
+        self.assertIn(
+            response.content,
+            '<error>The project must enabled for EpiCollect.</error>'
+        )
 
 
 class UploadDataTest(APITestCase):
@@ -65,6 +167,38 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, '1')
+
+    def test_upload_data_with_media(self):
+        project = ProjectF.create(
+            **{'isprivate': False, 'everyone_contributes': True}
+        )
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+        type1 = CategoryFactory.create(**{'project': project})
+        field = TextFieldFactory(**{'category': type1})
+
+        data = ('location_lat=51.5175205&location_lon=-0.1729205&location_acc='
+                '20&location_alt=&location_bearing=&category={category}&'
+                '{field_key}_{category}=Westbourne+Park&photo=abc&'
+                'video=def'.format(
+                    category=type1.id,
+                    field_key=field.key)
+                )
+
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:upload', kwargs={
+            'project_id': project.id
+        })
+        request = factory.post(
+            url + '?type=data',
+            data,
+            content_type='application/x-www-form-urlencoded'
+        )
+
+        view = EpiCollectUploadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(EpiCollectMedia.objects.count(), 2)
         self.assertEqual(response.content, '1')
 
     def test_upload_data_without_location(self):
@@ -285,3 +419,28 @@ class DownloadDataTest(APITestCase):
         view = EpiCollectDownloadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
+
+    def test_download_data_as_tsv(self):
+        project = ProjectF.create(**{'isprivate': False})
+        EpiCollectProjectModel.objects.create(project=project, enabled=True)
+        ObservationFactory.create_batch(
+            20, **{'project': project, 'properties': {'key': 'value'}})
+
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:download', kwargs={
+            'project_id': project.id
+        }) + '?xml=false'
+        request = factory.get(url)
+        view = EpiCollectDownloadView.as_view()
+        response = view(request, project_id=project.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_download_data_non_existing_project(self):
+        factory = APIRequestFactory()
+        url = reverse('geokey_epicollect:download', kwargs={
+            'project_id': 56456123156
+        })
+        request = factory.get(url)
+        view = EpiCollectDownloadView.as_view()
+        response = view(request, project_id=56456123156)
+        self.assertEqual(response.status_code, 403)

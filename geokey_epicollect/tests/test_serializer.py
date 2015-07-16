@@ -331,7 +331,7 @@ class ProjectFormSerializerTest(TestCase):
 class SerializeDataTest(TestCase):
     def test_serialize_observation(self):
         observation = ObservationFactory.create()
-        observation.attributes = {'thekey': '46'}
+        observation.properties = {'thekey': '46'}
 
         serializer = DataSerializer()
         xml = serializer.serialize_entry_to_xml(observation)
@@ -344,6 +344,37 @@ class SerializeDataTest(TestCase):
             observation.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             xml.find('uploaded').text
         )
+        self.assertEqual(
+            xml.find('thekey_%s' % observation.category.id).text,
+            '46'
+        )
+
+    def test_serialize_observation_with_null_val(self):
+        observation = ObservationFactory.create()
+        observation.properties = {'thekey': None}
+
+        serializer = DataSerializer()
+        xml = serializer.serialize_entry_to_xml(observation)
+        self.assertEqual(str(observation.id), xml.find('id').text)
+        self.assertEqual(
+            str(calendar.timegm(observation.created_at.utctimetuple())),
+            xml.find('created').text)
+        self.assertEqual(
+            observation.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            xml.find('uploaded').text
+        )
+        self.assertEqual(
+            xml.find('thekey_%s' % observation.category.id).text,
+            'Null'
+        )
+
+    def test_serialize_entry_to_tsv(self):
+        observation = ObservationFactory.create()
+        observation.properties = {'thekey': None}
+
+        serializer = DataSerializer()
+        tsv = serializer.serialize_entry_to_tsv(observation)
+        self.assertIn('thekey_%s\tNull' % observation.category.id, tsv)
 
     def test_serialize_all_to_xml(self):
         number = 20
