@@ -7,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework.test import APITestCase, APIRequestFactory
 
+from geokey import version
 from geokey.users.tests.model_factories import UserF
 from geokey.projects.models import Project
 from geokey.projects.tests.model_factories import ProjectF
@@ -55,7 +56,8 @@ class IndexPageTest(TestCase):
                 'epicollect': [enabled],
                 'host': self.request.get_host(),
                 'user': project.creator,
-                'PLATFORM_NAME': get_current_site(self.request).name
+                'PLATFORM_NAME': get_current_site(self.request).name,
+                'GEOKEY_VERSION': version.get_version
             }
         )
         self.assertEqual(response.status_code, 200)
@@ -100,7 +102,8 @@ class IndexPageTest(TestCase):
                 'epicollect': [],
                 'host': self.request.get_host(),
                 'user': project.creator,
-                'PLATFORM_NAME': get_current_site(self.request).name
+                'PLATFORM_NAME': get_current_site(self.request).name,
+                'GEOKEY_VERSION': version.get_version
             }
         )
         self.assertEqual(response.content.decode('utf-8'), rendered)
@@ -341,15 +344,16 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '0')
 
     def test_upload_image(self):
+        image = get_image()
         project = ProjectF.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
             contribution=contribution,
-            file_name='lmkasdasdnjkasndausidnjaksndsa.jpg'
+            file_name=image.name
         )
 
-        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        data = {'name': image}
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
@@ -362,15 +366,16 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '1')
 
     def test_upload_image_with_fullimage_flag(self):
+        image = get_image()
         project = ProjectF.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
             contribution=contribution,
-            file_name='lmkasdasdnjkasndausidnjaksndsa.jpg'
+            file_name=image.name
         )
 
-        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        data = {'name': image}
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id
@@ -383,6 +388,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '1')
 
     def test_upload_image_with_wrong_file_name(self):
+        image = get_image()
         project = ProjectF.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
@@ -391,7 +397,7 @@ class UploadDataTest(APITestCase):
             file_name='file_name.jpg'
         )
 
-        data = {'lmkasdasdnjkasndausidnjaksndsa.jpg.jpg': get_image()}
+        data = {'name': image}
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
             'project_id': project.id

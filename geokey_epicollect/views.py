@@ -1,4 +1,7 @@
 import json
+
+from datetime import datetime
+
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 from braces.views import LoginRequiredMixin
@@ -81,104 +84,115 @@ class EpiCollectUploadView(APIView):
         user = User.objects.get(display_name='AnonymousUser')
         upload_type = request.GET.get('type')
 
-        if upload_type == 'data':
-            data = request.POST
+        if upload_type in ['thumbnail', 'full_image']:
+            the_file = request.FILES.get('name')
 
             try:
-                category = Category.objects.get(pk=data.get('category'))
-            except Category.DoesNotExist:
-                return HttpResponse('0')
-            except ValueError:
-                # The value provided for category is not a number
-                return HttpResponse('0')
-
-            try:
-                lng = float(data.get('location_lon'))
-                lat = float(data.get('location_lat'))
-            except TypeError:
+                epicollect_file = EpiCollectMedia.objects.get(
+                    file_name=the_file.name
+                )
+            except EpiCollectMedia.DoesNotExist:
                 return HttpResponse('0')
 
-            observation = {
-                'type': 'Feature',
-                'location': {
-                    'geometry': ('{"type": "Point", "coordinates": '
-                                 '[%s, %s]}' % (lng, lat))
-                },
-                'properties': {
-                    'location_acc': data.get('location_acc'),
-                    'location_provider': data.get('location_provider'),
-                    'location_alt': data.get('location_alt'),
-                    'location_bearing': data.get('location_bearing'),
-                    'unique_id': data.get('unique_id'),
-                    'DeviceID': request.GET.get('phoneid')
-                },
-                'meta': {
-                    'category': data.get('category'),
-                }
-            }
-
-            for field in category.fields.all():
-                key = field.key.replace('-', '_')
-                value = data.get(key + '_' + str(category.id))
-                if field.fieldtype == 'MultipleLookupField':
-                    value = json.loads('[' + value + ']')
-
-                observation['properties'][field.key] = value
-
-            contribution = ContributionSerializer(
-                data=observation,
-                context={'user': user, 'project': epicollect.project}
+            ImageFile.objects.create(
+                name=the_file.name,
+                description='',
+                creator=user,
+                contribution=epicollect_file.contribution,
+                image=the_file
             )
-            if contribution.is_valid(raise_exception=True):
-                contribution.save()
 
-            photo_id = data.get('photo')
-            if photo_id is not None:
-                EpiCollectMedia.objects.create(
-                    contribution=contribution.instance,
-                    file_name=photo_id
-                )
-
-            video_id = data.get('video')
-            if video_id is not None:
-                EpiCollectMedia.objects.create(
-                    contribution=contribution.instance,
-                    file_name=video_id
-                )
-
-            return HttpResponse('1')
-
-        elif upload_type in ['thumbnail', 'full_image']:
-            for key in request.FILES:
-                try:
-                    epicollect_file = EpiCollectMedia.objects.get(
-                        file_name=key[:key.rfind('.')]
-                    )
-                    file = request.FILES.get(key)
-                except EpiCollectMedia.DoesNotExist:
-                    return HttpResponse('0')
-
-                ImageFile.objects.create(
-                    name=key,
-                    description='',
-                    creator=user,
-                    contribution=epicollect_file.contribution,
-                    image=file
-                )
-
-                epicollect_file.delete()
+            epicollect_file.delete()
 
             return HttpResponse('1')
 
         elif upload_type == 'video':
-            file = request.FILES.get('name')
-            name = file._name
-            epicollect_file = EpiCollectMedia.objects.get(file_name=name)
+            the_file = request.FILES.get('name')
+
+            try:
+                epicollect_file = EpiCollectMedia.objects.get(
+                    file_name=the_file.name
+                )
+            except EpiCollectMedia.DoesNotExist:
+                return HttpResponse('0')
 
             MediaFile.objects._create_video_file(
-                name, '', user, epicollect_file.contribution, file)
+                the_file.name,
+                '',
+                user,
+                epicollect_file.contribution,
+                the_file
+            )
             epicollect_file.delete()
             return HttpResponse('1')
+
+        data = request.POST
+
+        try:
+            category = Category.objects.get(pk=data.get('category'))
+        except Category.DoesNotExist:
+            return HttpResponse('0')
+        except ValueError:
+            # The value provided for category is not a number
+            return HttpResponse('0')
+
+        try:
+            lng = float(data.get('location_lon'))
+            lat = float(data.get('location_lat'))
+        except TypeError:
+            return HttpResponse('0')
+
+        observation = {
+            'type': 'Feature',
+            'location': {
+                'geometry': ('{"type": "Point", "coordinates": '
+                             '[%s, %s]}' % (lng, lat))
+            },
+            'properties': {
+                'location_acc': data.get('location_acc'),
+                'location_provider': data.get('location_provider'),
+                'location_alt': data.get('location_alt'),
+                'location_bearing': data.get('location_bearing'),
+                'unique_id': data.get('unique_id'),
+                'DeviceID': request.GET.get('phoneid')
+            },
+            'meta': {
+                'category': data.get('category'),
+            }
+        }
+
+        for field in category.fields.all():
+            key = field.key.replace('-', '_')
+            value = data.get(key + '_' + str(category.id))
+            if field.fieldtype == 'MultipleLookupField':
+                value = json.loads('[' + value + ']')
+            elif field.fieldtype in ['DateField', 'DateTimeField']:
+                value = datetime.strptime(value, '%d/%m/%Y').strftime('%Y-%m-%d')
+
+            observation['properties'][field.key] = value
+
+        contribution = ContributionSerializer(
+            data=observation,
+            context={'user': user, 'project': epicollect.project}
+        )
+        if contribution.is_valid(raise_exception=True):
+            contribution.save()
+
+        photo_id = data.get('photo')
+        if photo_id is not None:
+            EpiCollectMedia.objects.create(
+                contribution=contribution.instance,
+                file_name=photo_id
+            )
+
+        video_id = data.get('video')
+        if video_id is not None:
+            EpiCollectMedia.objects.create(
+                contribution=contribution.instance,
+                file_name=video_id
+            )
+
+        return HttpResponse('1')
 
 
 class EpiCollectDownloadView(APIView):

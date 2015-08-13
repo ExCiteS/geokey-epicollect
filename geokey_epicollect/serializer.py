@@ -143,7 +143,7 @@ class ProjectFormSerializer(object):
 
     def serialize_time_field(self, field):
         """
-        Serialises a DateField or DateTimeField.
+        Serialises a TimeField.
         """
         element = self.create_base_input(field)
         element.attrib['time'] = 'HH:mm'
