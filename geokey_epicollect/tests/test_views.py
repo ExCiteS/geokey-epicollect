@@ -8,6 +8,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.test import APITestCase, APIRequestFactory
 
 from geokey import version
+from geokey.users.models import User
 from geokey.users.tests.model_factories import UserF
 from geokey.projects.models import Project
 from geokey.projects.tests.model_factories import ProjectF
@@ -142,6 +143,10 @@ class ProjectDescriptionViewTest(APITestCase):
 
 
 class UploadDataTest(APITestCase):
+    def setUp(self):
+        if not User.objects.filter(display_name='AnonymousUser').exists():
+            UserF.create(display_name='AnonymousUser')
+
     def test_upload_data(self):
         project = ProjectF.create(
             **{'isprivate': False, 'everyone_contributes': True}
