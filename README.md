@@ -29,12 +29,7 @@ sudo pip install geokey-epicollect
         )
     ```
 
-2. Include the epicollect URLconf in your extensions urls.py (`settings/urls.py`) like this:
-
-    ```
-        url(r'^', include('geokey_epicollect.urls', namespace='geokey_epicollect')),
-    ```
-3. Add the epicollect table to the db like this:
+2. Add the epicollect table to the db like this:
 
     ```
         ../env/bin/python manage.py migrate
