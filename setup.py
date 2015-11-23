@@ -1,31 +1,23 @@
-from setuptools import setup
+#!/usr/bin/env python
+
+from os.path import join
+from setuptools import setup, find_packages
+
+
+name = 'geokey-epicollect'
+version = __import__(name.replace('-', '_')).__version__
+repository = join('https://github.com/ExCiteS', name)
 
 setup(
-    # Application name:
-    name="geokey_epicollect",
-
-    description='Enables GeoKey to be used with EpiCollect for data collection.',
-
-    # Version number (initial):
-    version="0.2.1",
-
-    # Application author details:
-    author="Oliver Roick",
-    author_email="o.roick@ucl.ac.uk",
-
-    url='https://github.com/ExCiteS/geokey-epicollect',
-    download_url='https://github.com/excites/geokey-epicollect/releases',
-
-    # Packages
-    packages=["geokey_epicollect"],
-
-    package_data={'geokey_epicollect': ['templates/*.html', 'migrations/*.py']},
-
-    # Include additional files into the package
+    name=name,
+    version=version,
+    description='Use EpiCollect to collect data for GeoKey',
+    url=repository,
+    download_url=join(repository, 'tarball', version),
+    author='Oliver Roick',
+    author_email='excitesucl@gmail.com',
+    license='MIT',
+    packages=find_packages(exclude=['*.tests', '*.tests.*', 'tests.*']),
     include_package_data=True,
-
-    # Dependent packages (distributions)
-    install_requires=[
-        'lxml==3.3.5'
-    ],
+    install_requires=['lxml==3.3.5'],
 )
