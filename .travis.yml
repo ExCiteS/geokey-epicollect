@@ -1,0 +1,45 @@
+language: python
+
+python:
+  - '2.7'
+
+services:
+  - postgresql
+
+addons:
+  postgresql: '9.4'
+
+virtualenv:
+  system_site_packages: true
+
+install:
+  - sudo rm /etc/apt/sources.list.d/ubuntugis-stable-source.list
+  - sudo apt-get update -y
+  - sudo apt-get install python-gdal gdal-bin binutils libxml2-dev libxslt1-dev
+  - export C_INCLUDE_PATH=/usr/include/gdal
+  - export CPLUS_INCLUDE_PATH=/usr/include/gdal
+  - pip install --upgrade pip
+
+before_script:
+  - psql template1 postgres -c 'create extension hstore;'
+  - psql -c 'create database geokey;' -U postgres
+  - psql -U postgres -d geokey -c "create extension postgis;"
+  - pip install geokey
+  - pip install -r travis/requirements.txt
+  - pip install -e .
+  - python travis/manage.py migrate
+
+script:
+  - coverage run --source=geokey_epicollect travis/manage.py test geokey_epicollect
+
+after_success:
+  - coveralls
+
+deploy:
+  provider: pypi
+  user: excites
+  password:
+    secure: aoijikh3XtaaignvSp7N9VdFhqVCoLT7mpEbgeJE1NcL+AQr4EseqP6DZn9Yk/VxrU2G2Ufd53a1Twm4bQC+7r5ffvV/6s787SbIhFYQDkcAIJZjEnX+Qcxu8OBzNCQK0r0vX1z/yw5Ea4azuPcp/SeFaB4mrsu5TJfZ8xRtOzY=
+  on:
+    tags: true
+    branch: master
