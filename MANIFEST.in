@@ -1,2 +1,4 @@
-recursive-include geokey_epicollect/templates *
-recursive-include geokey_epicollect/migrations *
+include README.rst
+include LICENSE
+recursive-include geokey_export/templates *
+recursive-exclude travis *
