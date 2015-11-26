@@ -3,6 +3,11 @@
 *.pyc
 *.egg-info
 
+# Coverage reports
+htmlcov
+.coverage
+coverage.xml
+
 # Folder view configuration files
 .DS_Store
 Desktop.ini
