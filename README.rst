@@ -52,12 +52,6 @@ Migrate the models into the database:
 
     python manage.py migrate geokey_epicollect
 
-Copy static files:
-
-.. code-block:: console
-
-    python manage.py collectstatic
-
 You're now ready to go!
 
 Test
