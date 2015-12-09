@@ -1,4 +1,3 @@
-from lxml import etree
 import calendar
 from django.test import TestCase
 
@@ -9,7 +8,7 @@ from geokey.categories.tests.model_factories import (
     MultipleLookupFieldFactory, MultipleLookupValueFactory
 )
 
-from geokey.projects.tests.model_factories import ProjectF
+from geokey.projects.tests.model_factories import ProjectFactory
 from geokey.categories.tests.model_factories import CategoryFactory
 from geokey.contributions.tests.model_factories import ObservationFactory
 
@@ -301,7 +300,7 @@ class ProjectFormSerializerTest(TestCase):
             xml.attrib['decimal']
 
     def test_serialize_project(self):
-        project = ProjectF()
+        project = ProjectFactory()
         type1 = CategoryFactory.create(**{'project': project})
         TextFieldFactory(**{'category': type1})
         type2 = CategoryFactory.create(**{'project': project})
@@ -378,7 +377,7 @@ class SerializeDataTest(TestCase):
 
     def test_serialize_all_to_xml(self):
         number = 20
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         ObservationFactory.create_batch(
             number, **{'project': project, 'properties': {'key': 'value'}}
         )
@@ -390,7 +389,7 @@ class SerializeDataTest(TestCase):
 
     def test_serialize_all_to_tsv(self):
         number = 20
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         ObservationFactory.create_batch(
             number, **{'project': project, 'properties': {'key': 'value'}}
         )

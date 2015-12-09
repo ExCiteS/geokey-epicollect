@@ -9,9 +9,9 @@ from rest_framework.test import APITestCase, APIRequestFactory
 
 from geokey import version
 from geokey.users.models import User
-from geokey.users.tests.model_factories import UserF
+from geokey.users.tests.model_factories import UserFactory
 from geokey.projects.models import Project
-from geokey.projects.tests.model_factories import ProjectF
+from geokey.projects.tests.model_factories import ProjectFactory
 from geokey.contributions.tests.model_factories import ObservationFactory
 from geokey.contributions.tests.media.model_factories import get_image
 from geokey.categories.tests.model_factories import (
@@ -42,7 +42,7 @@ class IndexPageTest(TestCase):
         self.assertIn('/admin/account/login/', response['location'])
 
     def test_get_with_user(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         enabled = EpiCollectProjectModel.objects.create(
             project=project, enabled=True
         )
@@ -65,7 +65,7 @@ class IndexPageTest(TestCase):
         self.assertEqual(response.content.decode('utf-8'), rendered)
 
     def test_post_with_anonymous(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(
             project=project, enabled=True
         )
@@ -80,9 +80,11 @@ class IndexPageTest(TestCase):
         self.assertEqual(EpiCollectProjectModel.objects.count(), 1)
 
     def test_post_with_user(self):
-        user = UserF.create()
-        project = ProjectF.create(**{'isprivate': False, 'creator': user})
-        to_enable = ProjectF.create(**{'isprivate': False, 'creator': user})
+        user = UserFactory.create()
+        project = ProjectFactory.create(
+            **{'isprivate': False, 'creator': user})
+        to_enable = ProjectFactory.create(
+            **{'isprivate': False, 'creator': user})
         EpiCollectProjectModel.objects.create(
             project=project, enabled=True
         )
@@ -112,7 +114,7 @@ class IndexPageTest(TestCase):
 
 class ProjectDescriptionViewTest(APITestCase):
     def test_get_project(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         type1 = CategoryFactory.create(**{'project': project})
         TextFieldFactory(**{'category': type1})
@@ -145,10 +147,10 @@ class ProjectDescriptionViewTest(APITestCase):
 class UploadDataTest(APITestCase):
     def setUp(self):
         if not User.objects.filter(display_name='AnonymousUser').exists():
-            UserF.create(display_name='AnonymousUser')
+            UserFactory.create(display_name='AnonymousUser')
 
     def test_upload_data(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -178,7 +180,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '1')
 
     def test_upload_data_with_media(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -210,7 +212,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '1')
 
     def test_upload_data_without_location(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -239,7 +241,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '0')
 
     def test_upload_category_does_not_exist(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -263,7 +265,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '0')
 
     def test_upload_category_is_null(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -287,7 +289,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '0')
 
     def test_upload_checkboxes(self):
-        project = ProjectF.create(
+        project = ProjectFactory.create(
             **{'isprivate': False, 'everyone_contributes': True}
         )
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
@@ -303,8 +305,7 @@ class UploadDataTest(APITestCase):
                     field_key=field.key,
                     checkbox_1=val_1.id,
                     checkbox_2=val_2.id
-                    )
-                )
+                ))
 
         factory = APIRequestFactory()
         url = reverse('geokey_epicollect:upload', kwargs={
@@ -322,7 +323,7 @@ class UploadDataTest(APITestCase):
         self.assertEqual(response.content, '1')
 
     def test_upload_data_to_private_project(self):
-        project = ProjectF.create()
+        project = ProjectFactory.create()
         type1 = CategoryFactory.create(**{'project': project})
         field = TextFieldFactory(**{'category': type1})
 
@@ -350,7 +351,7 @@ class UploadDataTest(APITestCase):
 
     def test_upload_image(self):
         image = get_image()
-        project = ProjectF.create()
+        project = ProjectFactory.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
@@ -372,7 +373,7 @@ class UploadDataTest(APITestCase):
 
     def test_upload_image_with_fullimage_flag(self):
         image = get_image()
-        project = ProjectF.create()
+        project = ProjectFactory.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
@@ -394,7 +395,7 @@ class UploadDataTest(APITestCase):
 
     def test_upload_image_with_wrong_file_name(self):
         image = get_image()
-        project = ProjectF.create()
+        project = ProjectFactory.create()
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         contribution = ObservationFactory.create(**{'project': project})
         EpiCollectMedia.objects.create(
@@ -417,7 +418,7 @@ class UploadDataTest(APITestCase):
 
 class DownloadDataTest(APITestCase):
     def test_download_data(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         ObservationFactory.create_batch(
             20, **{'project': project, 'properties': {'key': 'value'}})
@@ -432,7 +433,7 @@ class DownloadDataTest(APITestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_download_data_as_tsv(self):
-        project = ProjectF.create(**{'isprivate': False})
+        project = ProjectFactory.create(**{'isprivate': False})
         EpiCollectProjectModel.objects.create(project=project, enabled=True)
         ObservationFactory.create_batch(
             20, **{'project': project, 'properties': {'key': 'value'}})
