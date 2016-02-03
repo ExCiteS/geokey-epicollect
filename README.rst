@@ -18,6 +18,11 @@ Use `EpiCollect <http://www.epicollect.net>`_'s phone app as a mobile client to 
 Install
 -------
 
+geokey-epicollect requires:
+
+- Python version 2.7
+- GeoKey version 0.9 or greater
+
 Make sure these dependencies are installed:
 
 .. code-block:: console
