@@ -1,3 +1,2 @@
-django_nose
 factory-boy
 coveralls
