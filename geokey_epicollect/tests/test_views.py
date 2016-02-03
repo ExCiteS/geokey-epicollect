@@ -8,6 +8,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.test import APITestCase, APIRequestFactory
 
 from geokey import version
+from geokey.core.tests.helpers import render_helpers
 from geokey.users.models import User
 from geokey.users.tests.model_factories import UserFactory
 from geokey.projects.models import Project
@@ -62,7 +63,8 @@ class IndexPageTest(TestCase):
             }
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content.decode('utf-8'), rendered)
+        response = render_helpers.remove_csrf(response.content.decode('utf-8'))
+        self.assertEqual(response, rendered)
 
     def test_post_with_anonymous(self):
         project = ProjectFactory.create(**{'isprivate': False})
@@ -109,7 +111,8 @@ class IndexPageTest(TestCase):
                 'GEOKEY_VERSION': version.get_version
             }
         )
-        self.assertEqual(response.content.decode('utf-8'), rendered)
+        response = render_helpers.remove_csrf(response.content.decode('utf-8'))
+        self.assertEqual(response, rendered)
 
 
 class ProjectDescriptionViewTest(APITestCase):
