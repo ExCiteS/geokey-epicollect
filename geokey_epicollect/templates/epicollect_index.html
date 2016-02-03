@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block title %} | EpiCollect{% endblock %}
 
@@ -11,45 +11,52 @@
 
 <div class="container">
     {% include 'snippets/messages.html' %}
+</div>
+
+<div class="container">
     <div class="row">
-        <form class="col-md-8" method="POST" action="{% url 'geokey_epicollect:index' %}">
-            <h3 class="header">Manage your EpiCollect projects</h3>
-            {% csrf_token %}
+        <div class="col-md-12">
+            <h3 class="header">Manage projects</h3>
 
-            {% for project in projects %}
+            <form method="POST" action="{% url 'geokey_epicollect:index' %}">
+                {% csrf_token %}
 
-            {% if forloop.first %}
-            <ul class="list-unstyled overview-list">
-            {% endif %}
+                {% for project in projects %}
+                    {% if forloop.first %}
+                        <ul class="list-unstyled overview-list">
+                    {% endif %}
 
-            <li>
-                <h4>{{ project.name }}</h4>
-                {% if project.description %}<p>{{project.description}}</p>{% endif %}
-                <p class="meta">Epicollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}"><span class="lower-case">http://{{ host }}{% url 'geokey_epicollect:project_form' project.id %}</span></a></p>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="epicollect_project" value="{{ project.id }}" {% if project.epicollect %}checked{% endif %}> Enable for use with EpiCollect
-                        </label>
+                    <li>
+                        <h4>{{ project.name }}</h4>
+                        {% if project.description %}<p>{{ project.description }}</p>{% endif %}
+
+                        <p class="meta">EpiCollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}"><span class="lower-case">http://{{ host }}{% url 'geokey_epicollect:project_form' project.id %}</span></a></p>
+
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="epicollect_project" value="{{ project.id }}" {% if project.epicollect %}checked{% endif %}> Enable for use with EpiCollect
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+
+                    {% if forloop.last %}
+                        </ul>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="reset" class="btn btn-link">Reset</button>
+                        </div>
+                    {% endif%}
+                {% empty %}
+                    <div class="well empty-list">
+                        <p class="lead">We couldn't find any projects you are eligible to manage.</p>
+                        <p>You can create a new project if you want to start your own map.</p>
+                        <a href="{% url 'admin:project_create' %}" class="btn btn-success btn-lg">Create a new project</a>
                     </div>
-                </div>
-            </li>
-
-            {% if forloop.last %}
-            </ul>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <button type="reset" class="btn btn-link">Reset</button>
-            </div>
-            {% endif%}
-            {% empty %}
-            <div class="well empty-list">
-                <p class="lead">We couldn't find any projects you are eligible to manage.</p>
-                <p>You can create a new project if you want to start your own community map.</p>
-                <a href="{% url 'admin:project_create' %}" class="btn btn-success btn-lg">Create a new project</a>
-            </div>
-            {% endfor %}
-        </form>
+                {% endfor %}
+            </form>
     </div>
 </div>
 {% endblock %}
