@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from views import (
     IndexPage, EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
 )
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(
         r'^admin/epicollect/$',
         IndexPage.as_view(),
@@ -22,4 +21,4 @@ urlpatterns = patterns(
         r'^api/epicollect/projects/(?P<project_id>[0-9]+)/upload/$',
         EpiCollectUploadView.as_view(),
         name='upload')
-)
+]
