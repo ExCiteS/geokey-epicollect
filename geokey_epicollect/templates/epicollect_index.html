@@ -30,7 +30,7 @@
                         <h4>{{ project.name }}</h4>
                         {% if project.description %}<p>{{ project.description }}</p>{% endif %}
 
-                        <p class="meta">EpiCollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}"><span class="lower-case">http://{{ host }}{% url 'geokey_epicollect:project_form' project.id %}</span></a></p>
+                        <p class="meta">EpiCollect URL: <a href="{% url 'geokey_epicollect:project_form' project.id %}"><span class="lower-case">{{ protocol }}://{{ host }}{% url 'geokey_epicollect:project_form' project.id %}</span></a></p>
 
                         <div class="form-group">
                             <div class="checkbox">

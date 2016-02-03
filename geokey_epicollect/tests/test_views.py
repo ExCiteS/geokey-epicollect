@@ -56,6 +56,7 @@ class IndexPageTest(TestCase):
             {
                 'projects': [project],
                 'epicollect': [enabled],
+                'protocol': self.request.scheme,
                 'host': self.request.get_host(),
                 'user': project.creator,
                 'PLATFORM_NAME': get_current_site(self.request).name,
@@ -105,6 +106,7 @@ class IndexPageTest(TestCase):
                     Project.objects.get(pk=to_enable.id)
                 ],
                 'epicollect': [],
+                'protocol': self.request.scheme,
                 'host': self.request.get_host(),
                 'user': project.creator,
                 'PLATFORM_NAME': get_current_site(self.request).name,
