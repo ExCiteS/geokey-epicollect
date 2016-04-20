@@ -23,11 +23,11 @@ geokey-epicollect requires:
 - Python version 2.7
 - GeoKey version 0.9 or greater
 
-Make sure these dependencies are installed:
+Make sure the dependencies are installed:
 
 .. code-block:: console
-    sudo apt-get install libxml2-dev
-    sudo apt-get install libxslt1-dev
+
+    sudo apt-get install libxslt1-dev libxml2-dev
 
 Install the extension from PyPI:
 
