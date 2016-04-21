@@ -1,4 +1,4 @@
 include README.rst
 include LICENSE
-recursive-include geokey_export/templates *
+recursive-include geokey_epicollect/templates *
 recursive-exclude travis *
