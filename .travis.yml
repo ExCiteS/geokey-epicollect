@@ -1,47 +1,51 @@
+dist: trusty
 language: python
-
-python:
-  - '2.7'
 
 services:
   - postgresql
 
+python:
+  - '2.7'
+
 addons:
   postgresql: '9.4'
+  apt:
+    packages:
+      - postgresql-9.4-postgis-2.3
 
 env:
-  - GEOKEY='>=0.9,<0.10' DJANGO='>=1.8,<1.9'
-  - GEOKEY='>=0.9,<0.10' DJANGO='>=1.9,<1.10'
-  - GEOKEY='>=0.10,<1.0' DJANGO='>=1.8,<1.9'
-  - GEOKEY='>=0.10,<1.0' DJANGO='>=1.9,<1.10'
   - GEOKEY='>=1.0,<1.1' DJANGO='>=1.8,<1.9'
   - GEOKEY='>=1.0,<1.1' DJANGO='>=1.9,<1.10'
+  - GEOKEY='>=1.1,<1.2' DJANGO='>=1.8,<1.9'
+  - GEOKEY='>=1.1,<1.2' DJANGO='>=1.9,<1.10'
+  - GEOKEY='>=1.2,<1.3' DJANGO='>=1.8,<1.9'
+  - GEOKEY='>=1.2,<1.3' DJANGO='>=1.9,<1.10'
 
 virtualenv:
   system_site_packages: true
 
 install:
-  - sudo rm /etc/apt/sources.list.d/ubuntugis-stable-source.list
-  - sudo apt-get update -y
-  - sudo apt-get install python-gdal gdal-bin binutils libxslt1-dev libxml2-dev
+  - sudo -E apt-get -yq update &>> ~/apt-get-update.log
+  - sudo apt-get install binutils libav-tools
+  - sudo apt-get -yq install libgdal-dev python-gdal
+  - gdal-config --version
   - export C_INCLUDE_PATH=/usr/include/gdal
   - export CPLUS_INCLUDE_PATH=/usr/include/gdal
-  - pip install --upgrade pip
 
 before_script:
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database geokey;' -U postgres
-  - psql -U postgres -d geokey -c "create extension postgis;"
+  - psql -U postgres -d geokey -c 'create extension postgis;'
   - pip install geokey$GEOKEY
   - pip install django$DJANGO
   - python -c "import django; print('DJANGO %s ' % django.get_version())"
   - python -c "from geokey.version import get_version; print('GEOKEY %s' % get_version())"
-  - pip install -r travis/requirements.txt
+  - pip install -r travis_ci/requirements.txt
   - pip install -e .
-  - python travis/manage.py migrate
+  - python travis_ci/manage.py migrate
 
 script:
-  - coverage run --source=geokey_epicollect travis/manage.py test geokey_epicollect
+  - coverage run --source=geokey_epicollect travis_ci/manage.py test geokey_epicollect
 
 after_success:
   - coveralls

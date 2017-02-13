@@ -3,6 +3,7 @@ branch = true
 
 [report]
 omit =
+    */travis_ci/*
     */tests/*
     */migrations/*
     */__init__.py

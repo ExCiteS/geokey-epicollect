@@ -21,7 +21,7 @@ Install
 geokey-epicollect requires:
 
 - Python version 2.7
-- GeoKey versions 0.9, 0.10, or 1.0
+- GeoKey version 1.0 or greater
 
 Make sure the dependencies are installed:
 
