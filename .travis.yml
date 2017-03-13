@@ -18,6 +18,8 @@ env:
   - GEOKEY='>=1.0,<1.1' DJANGO='>=1.9,<1.10'
   - GEOKEY='>=1.1,<1.2' DJANGO='>=1.8,<1.9'
   - GEOKEY='>=1.1,<1.2' DJANGO='>=1.9,<1.10'
+  - GEOKEY='>=1.2,<1.3' DJANGO='>=1.8,<1.9'
+  - GEOKEY='>=1.2,<1.3' DJANGO='>=1.9,<1.10'
   - GEOKEY='' DJANGO='>=1.8,<1.9'
   - GEOKEY='' DJANGO='>=1.9,<1.10'
 
