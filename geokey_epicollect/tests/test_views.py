@@ -144,7 +144,7 @@ class ProjectDescriptionViewTest(APITestCase):
         response = view(request, project_id=45454544)
         self.assertEqual(response.status_code, 403)
         self.assertIn(
-            response.content,
+            response.content.decode('utf-8'),
             '<error>The project must enabled for EpiCollect.</error>'
         )
 
@@ -182,7 +182,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '1')
+        self.assertEqual(response.content.decode('utf-8'), '1')
 
     def test_upload_data_with_media(self):
         project = ProjectFactory.create(
@@ -214,7 +214,7 @@ class UploadDataTest(APITestCase):
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(EpiCollectMedia.objects.count(), 2)
-        self.assertEqual(response.content, '1')
+        self.assertEqual(response.content.decode('utf-8'), '1')
 
     def test_upload_data_without_location(self):
         project = ProjectFactory.create(
@@ -243,7 +243,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '0')
+        self.assertEqual(response.content.decode('utf-8'), '0')
 
     def test_upload_category_does_not_exist(self):
         project = ProjectFactory.create(
@@ -267,7 +267,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '0')
+        self.assertEqual(response.content.decode('utf-8'), '0')
 
     def test_upload_category_is_null(self):
         project = ProjectFactory.create(
@@ -291,7 +291,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '0')
+        self.assertEqual(response.content.decode('utf-8'), '0')
 
     def test_upload_checkboxes(self):
         project = ProjectFactory.create(
@@ -325,7 +325,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '1')
+        self.assertEqual(response.content.decode('utf-8'), '1')
 
     def test_upload_data_to_private_project(self):
         project = ProjectFactory.create()
@@ -352,7 +352,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '0')
+        self.assertEqual(response.content.decode('utf-8'), '0')
 
     def test_upload_image(self):
         image = get_image()
@@ -374,7 +374,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '1')
+        self.assertEqual(response.content.decode('utf-8'), '1')
 
     def test_upload_image_with_fullimage_flag(self):
         image = get_image()
@@ -396,7 +396,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '1')
+        self.assertEqual(response.content.decode('utf-8'), '1')
 
     def test_upload_image_with_wrong_file_name(self):
         image = get_image()
@@ -418,7 +418,7 @@ class UploadDataTest(APITestCase):
         view = EpiCollectUploadView.as_view()
         response = view(request, project_id=project.id)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, '0')
+        self.assertEqual(response.content.decode('utf-8'), '0')
 
 
 class DownloadDataTest(APITestCase):
