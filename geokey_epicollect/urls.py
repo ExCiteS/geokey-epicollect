@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from views import (
+from geokey_epicollect.views import (
     IndexPage, EpiCollectProject, EpiCollectUploadView, EpiCollectDownloadView
 )
 

@@ -16,7 +16,7 @@ from geokey.contributions.serializers import ContributionSerializer
 from geokey.contributions.models import ImageFile, MediaFile
 from geokey.users.models import User
 
-from serializer import ProjectFormSerializer, DataSerializer
+from geokey_epicollect.serializer import ProjectFormSerializer, DataSerializer
 from .models import (
     EpiCollectMedia,
     EpiCollectProject as EpiCollectProjectModel
