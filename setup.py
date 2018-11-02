@@ -19,5 +19,5 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['*.tests', '*.tests.*', 'tests.*']),
     include_package_data=True,
-    install_requires=['lxml>=3.3.5'],
+    install_requires=['lxml==4.2.5'],
 )

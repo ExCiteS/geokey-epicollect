@@ -8,6 +8,7 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 SECRET_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxx'
 
+# Database settings
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -19,6 +20,7 @@ DATABASES = {
     }
 }
 
+
 INSTALLED_APPS += (
     'geokey_epicollect',
 )
@@ -29,3 +31,5 @@ MEDIA_ROOT = normpath(join(dirname(dirname(abspath(__file__))), 'assets'))
 MEDIA_URL = '/assets/'
 
 WSGI_APPLICATION = 'wsgi.application'
+
+ALLOWED_HOSTS = ['localhost']
