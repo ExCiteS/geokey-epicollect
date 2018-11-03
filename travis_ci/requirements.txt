@@ -1,4 +1,3 @@
 django-debug-toolbar
 factory-boy
 coveralls
-lxml==4.2.5
