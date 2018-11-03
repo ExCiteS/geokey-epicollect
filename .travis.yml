@@ -5,7 +5,7 @@ services:
   - postgresql
 
 python:
-  - '2.7'
+  - '2.7_with_system_site_packages'
   - '3.6'
 
 addons:
@@ -17,9 +17,6 @@ addons:
 env:
   - GEOKEY='>=1.6,<1.7' DJANGO='>=1.11,<1.12' DEPLOY=0
   - GEOKEY='>=1.7,<1.8' DJANGO='>=1.11,<1.12' DEPLOY=1
-
-virtualenv:
-  system_site_packages: true
 
 install:
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
