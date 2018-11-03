@@ -6,6 +6,7 @@ services:
 
 python:
   - '2.7'
+  - '3.6'
 
 addons:
   postgresql: '9.4'
@@ -54,4 +55,5 @@ deploy:
   on:
     tags: true
     branch: master
+    python: '3.6'
     condition: $DEPLOY = 1
