@@ -20,6 +20,7 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['localhost']
 
 INSTALLED_APPS += (
     'geokey_epicollect',
@@ -31,5 +32,3 @@ MEDIA_ROOT = normpath(join(dirname(dirname(abspath(__file__))), 'assets'))
 MEDIA_URL = '/assets/'
 
 WSGI_APPLICATION = 'wsgi.application'
-
-ALLOWED_HOSTS = ['localhost']
