@@ -19,6 +19,8 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['localhost']
+
 INSTALLED_APPS += (
     'geokey_epicollect',
 )
