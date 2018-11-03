@@ -8,7 +8,6 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 
 SECRET_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxx'
 
-# Database settings
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
